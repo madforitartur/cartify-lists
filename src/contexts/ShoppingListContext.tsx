@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ShoppingList, ShoppingItem, Category } from '@/types';
-import { toast } from "@/components/ui/sonner";
+// Replace the incorrect import with the correct sonner import
+import { toast } from "sonner";
 
 interface ShoppingListContextType {
   lists: ShoppingList[];
