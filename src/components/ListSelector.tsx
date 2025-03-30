@@ -7,7 +7,7 @@ import ListSelectorCard from './ListSelectorCard';
 import AddEditListDialog from './AddEditListDialog';
 
 const ListSelector: React.FC = () => {
-  const { lists, activeListId } = useShoppingList();
+  const { lists, activeListId, setActiveListId } = useShoppingList();
   const [addEditDialogOpen, setAddEditDialogOpen] = React.useState(false);
   const [listToEdit, setListToEdit] = React.useState<string | null>(null);
 
@@ -19,6 +19,12 @@ const ListSelector: React.FC = () => {
   const handleAddEditDialogClose = () => {
     setListToEdit(null);
     setAddEditDialogOpen(false);
+  };
+
+  const handleCreateNewList = () => {
+    // Clear the active list selection when creating a new list
+    setActiveListId(null);
+    setAddEditDialogOpen(true);
   };
 
   const getListToEdit = () => {
@@ -33,7 +39,7 @@ const ListSelector: React.FC = () => {
           <ShoppingCart className="mr-2 text-primary" />
           Minhas Listas
         </h2>
-        <Button onClick={() => setAddEditDialogOpen(true)}>
+        <Button onClick={handleCreateNewList}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Lista
         </Button>
@@ -46,7 +52,7 @@ const ListSelector: React.FC = () => {
           <p className="text-muted-foreground mb-4">
             Crie sua primeira lista de compras para começar
           </p>
-          <Button onClick={() => setAddEditDialogOpen(true)}>
+          <Button onClick={handleCreateNewList}>
             <Plus className="mr-2 h-4 w-4" />
             Criar Lista
           </Button>

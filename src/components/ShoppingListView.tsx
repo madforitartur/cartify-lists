@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,7 @@ interface ShoppingListViewProps {
 }
 
 const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) => {
-  const { activeListId, getActiveList, calculateTotalPrice } = useShoppingList();
+  const { activeListId, getActiveList, calculateTotalPrice, setActiveListId } = useShoppingList();
   const [searchTerm, setSearchTerm] = useState('');
   const [addEditItemDialogOpen, setAddEditItemDialogOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<ShoppingItem | undefined>(undefined);
@@ -40,6 +41,12 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       </div>
     );
   }
+
+  const handleBackToLists = () => {
+    // Clear active list selection when going back to lists
+    setActiveListId(null);
+    onBackToLists();
+  };
 
   const handleAddItem = () => {
     setItemToEdit(undefined);
@@ -75,7 +82,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={onBackToLists} className="mr-2">
+          <Button variant="ghost" size="icon" onClick={handleBackToLists} className="mr-2">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
