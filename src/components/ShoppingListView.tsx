@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,11 +75,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          {isMobile && (
-            <Button variant="ghost" size="icon" onClick={onBackToLists} className="mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          )}
+          <Button variant="ghost" size="icon" onClick={onBackToLists} className="mr-2">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <div>
             <h2 className="text-2xl font-semibold">{activeList.name}</h2>
             <p className="text-muted-foreground">
