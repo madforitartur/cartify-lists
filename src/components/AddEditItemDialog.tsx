@@ -90,14 +90,16 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   const incrementQuantity = () => {
     setFormState(prev => ({
       ...prev,
-      quantity: prev.quantity + 1
+      quantity: prev.unit === 'un' ? Math.floor(prev.quantity + 1) : +(prev.quantity + 0.1).toFixed(2)
     }));
   };
 
   const decrementQuantity = () => {
     setFormState(prev => ({
       ...prev,
-      quantity: Math.max(1, prev.quantity - 1)
+      quantity: prev.unit === 'un' 
+        ? Math.max(1, Math.floor(prev.quantity - 1)) 
+        : Math.max(0.1, +(prev.quantity - 0.1).toFixed(2))
     }));
   };
 
@@ -126,6 +128,14 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
     }
     
     onOpenChange(false);
+  };
+
+  const getQuantityStep = () => {
+    return formState.unit === 'un' ? "1" : "0.1";
+  };
+
+  const getQuantityMin = () => {
+    return formState.unit === 'un' ? "1" : "0.1";
   };
 
   return (
@@ -193,8 +203,8 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                   id="item-quantity"
                   name="quantity"
                   type="number"
-                  min="1"
-                  step="1"
+                  min={getQuantityMin()}
+                  step={getQuantityStep()}
                   value={formState.quantity}
                   onChange={handleChange}
                   className="h-8 rounded-none w-14 text-center"
