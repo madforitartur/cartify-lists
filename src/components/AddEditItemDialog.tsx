@@ -87,6 +87,20 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
     }));
   };
 
+  const incrementQuantity = () => {
+    setFormState(prev => ({
+      ...prev,
+      quantity: prev.quantity + 1
+    }));
+  };
+
+  const decrementQuantity = () => {
+    setFormState(prev => ({
+      ...prev,
+      quantity: Math.max(1, prev.quantity - 1)
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -165,16 +179,36 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
               <Label htmlFor="item-quantity" className="text-right">
                 Quantidade
               </Label>
-              <Input
-                id="item-quantity"
-                name="quantity"
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={formState.quantity}
-                onChange={handleChange}
-                className="col-span-1"
-              />
+              <div className="col-span-1 flex items-center">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-r-none"
+                  onClick={decrementQuantity}
+                >
+                  -
+                </Button>
+                <Input
+                  id="item-quantity"
+                  name="quantity"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={formState.quantity}
+                  onChange={handleChange}
+                  className="h-8 rounded-none w-14 text-center"
+                />
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-l-none"
+                  onClick={incrementQuantity}
+                >
+                  +
+                </Button>
+              </div>
               
               <Label htmlFor="item-unit" className="text-right">
                 Unidade
@@ -198,7 +232,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
             
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="item-price" className="text-right">
-                Preço (R$)
+                Preço (€)
               </Label>
               <Input
                 id="item-price"
@@ -209,7 +243,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 value={formState.price}
                 onChange={handleChange}
                 className="col-span-3"
-                placeholder="0.00"
+                placeholder="0,00"
               />
             </div>
           </div>
