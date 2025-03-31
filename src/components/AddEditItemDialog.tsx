@@ -44,6 +44,9 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
     price: 0,
     category: 'default' as Category
   });
+  
+  // Estado separado para controlar o campo de preço como string para facilitar input vazio
+  const [priceInput, setPriceInput] = React.useState('');
 
   const { addItem, updateItem } = useShoppingList();
   const isEditMode = !!itemToEdit;
@@ -59,6 +62,8 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
         price: itemToEdit.price,
         category: itemToEdit.category
       });
+      // Apenas definir o priceInput se o preço for maior que zero
+      setPriceInput(itemToEdit.price > 0 ? itemToEdit.price.toFixed(2) : '');
     } else if (!open) {
       // Reset form when dialog closes
       setFormState({
@@ -68,18 +73,26 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
         price: 0,
         category: 'default' as Category
       });
+      setPriceInput(''); // Resetar para vazio
     }
   }, [open, itemToEdit]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    setFormState(prev => ({
-      ...prev,
-      [name]: name === 'quantity' || name === 'price' 
-        ? parseFloat(value) || 0 
-        : value
-    }));
+    if (name === 'price') {
+      setPriceInput(value);
+      // Atualiza o formState.price apenas se tiver um valor válido
+      setFormState(prev => ({
+        ...prev,
+        price: value ? parseFloat(value) : 0
+      }));
+    } else {
+      setFormState(prev => ({
+        ...prev,
+        [name]: name === 'quantity' ? parseFloat(value) || 0 : value
+      }));
+    }
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -138,11 +151,6 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
 
   const getQuantityMin = () => {
     return formState.unit === 'un' ? "1" : "0.1";
-  };
-
-  // Format price to show 2 decimal places
-  const formatPrice = (price: number) => {
-    return price.toFixed(2);
   };
 
   return (
@@ -257,9 +265,10 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 id="item-price"
                 name="price"
                 type="number"
+                inputMode="decimal"
                 min="0"
                 step="0.01"
-                value={formatPrice(formState.price)}
+                value={priceInput}
                 onChange={handleChange}
                 className="col-span-3"
                 placeholder="0,00"
