@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -20,6 +20,7 @@ import {
 import { ShoppingItem, Category } from '@/types';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
 import { getCategoryOptions, CATEGORIES } from '@/utils/categories';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AddEditItemDialogProps {
   open: boolean;
@@ -47,8 +48,9 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   const { addItem, updateItem } = useShoppingList();
   const isEditMode = !!itemToEdit;
   const categoryOptions = getCategoryOptions();
+  const isMobile = useIsMobile();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (open && itemToEdit) {
       setFormState({
         name: itemToEdit.name,
@@ -140,7 +142,9 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent 
+        className={`sm:max-w-[500px] ${isMobile ? 'top-[5%] translate-y-0' : ''}`}
+      >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
@@ -207,7 +211,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                   step={getQuantityStep()}
                   value={formState.quantity}
                   onChange={handleChange}
-                  className="h-8 rounded-none w-14 text-center"
+                  className="h-8 rounded-none w-16 text-center"
                 />
                 <Button 
                   type="button"

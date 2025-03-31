@@ -80,7 +80,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" onClick={handleBackToLists} className="mr-2">
             <ArrowLeft className="h-5 w-5" />
@@ -96,11 +96,19 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
           <Button variant="outline" size="icon">
             <Share2 className="h-4 w-4" />
           </Button>
-          <Button onClick={handleAddItem}>
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Item
-          </Button>
         </div>
+      </div>
+      
+      {/* Total price card moved to the top */}
+      <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
+        <div>
+          <p className="text-sm text-muted-foreground">Valor Total Estimado</p>
+          <p className="text-2xl font-semibold">{formatCurrency(totalPrice)}</p>
+        </div>
+        <Button onClick={handleAddItem}>
+          <Plus className="mr-2 h-4 w-4" />
+          Adicionar Item
+        </Button>
       </div>
 
       <div className="mb-6">
@@ -156,29 +164,16 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
           )}
         </div>
       ) : (
-        <>
-          <div className="space-y-2 mb-6">
-            {itemsToDisplay.map(item => (
-              <ShoppingListItem 
-                key={item.id} 
-                item={item} 
-                listId={activeList.id}
-                onEdit={handleEditItem}
-              />
-            ))}
-          </div>
-          
-          <div className="bg-card border rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Valor Total Estimado</p>
-              <p className="text-2xl font-semibold">{formatCurrency(totalPrice)}</p>
-            </div>
-            <Button onClick={handleAddItem}>
-              <Plus className="mr-2 h-4 w-4" />
-              Adicionar Item
-            </Button>
-          </div>
-        </>
+        <div className="space-y-2">
+          {itemsToDisplay.map(item => (
+            <ShoppingListItem 
+              key={item.id} 
+              item={item} 
+              listId={activeList.id}
+              onEdit={handleEditItem}
+            />
+          ))}
+        </div>
       )}
 
       <AddEditItemDialog
