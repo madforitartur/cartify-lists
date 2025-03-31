@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ShoppingList } from '@/types';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AddEditListDialogProps {
   open: boolean;
@@ -27,6 +28,7 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
   const [listName, setListName] = React.useState(listToEdit?.name || '');
   const { createList, updateList } = useShoppingList();
   const isEditMode = !!listToEdit;
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     if (open && listToEdit) {
@@ -53,7 +55,9 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent 
+        className={`sm:max-w-[425px] ${isMobile ? 'top-[5%] translate-y-0' : ''}`}
+      >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>

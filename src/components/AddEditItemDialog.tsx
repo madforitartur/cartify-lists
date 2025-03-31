@@ -140,6 +140,11 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
     return formState.unit === 'un' ? "1" : "0.1";
   };
 
+  // Format price to show 2 decimal places
+  const formatPrice = (price: number) => {
+    return price.toFixed(2);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
@@ -254,7 +259,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 type="number"
                 min="0"
                 step="0.01"
-                value={formState.price}
+                value={formatPrice(formState.price)}
                 onChange={handleChange}
                 className="col-span-3"
                 placeholder="0,00"
