@@ -1,7 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem } from '@/types';
-// Replace the incorrect import with the correct sonner import
+import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory } from '@/types';
 import { toast } from "sonner";
 
 interface ShoppingListContextType {
@@ -35,7 +33,6 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [activeListId, setActiveListId] = useState<string | null>(null);
 
-  // Load lists from localStorage on initial render
   useEffect(() => {
     const storedLists = localStorage.getItem(STORAGE_KEY);
     if (storedLists) {
@@ -43,7 +40,6 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const parsedLists = JSON.parse(storedLists);
         setLists(parsedLists);
         
-        // Set the first list as active if there's no active list
         if (parsedLists.length > 0 && !activeListId) {
           setActiveListId(parsedLists[0].id);
         }
@@ -54,7 +50,6 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, []);
 
-  // Save to localStorage whenever lists changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
   }, [lists]);
@@ -86,12 +81,10 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const deleteList = (id: string) => {
-    // Get the list name for the toast message
     const listToDelete = lists.find(list => list.id === id);
     
     setLists(prev => prev.filter(list => list.id !== id));
     
-    // If the active list is deleted, set another as active
     if (activeListId === id) {
       const remainingLists = lists.filter(list => list.id !== id);
       setActiveListId(remainingLists.length > 0 ? remainingLists[0].id : null);
@@ -111,7 +104,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
         list.id === listId 
           ? { 
               ...list, 
-              items: [...list.items, newItem],
+              items: [...list.items, newItem as ShoppingItem | TaskItem],
               updatedAt: new Date().toISOString() 
             } 
           : list
@@ -134,7 +127,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
                       updatedAt: new Date().toISOString() 
                     } 
                   : item
-              ),
+              ) as (ShoppingItem | TaskItem)[],
               updatedAt: new Date().toISOString() 
             } 
           : list
@@ -144,7 +137,6 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const deleteItem = (listId: string, itemId: string) => {
-    // Get the item name for the toast message
     const listIndex = lists.findIndex(list => list.id === listId);
     if (listIndex === -1) return;
     

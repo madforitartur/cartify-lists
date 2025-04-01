@@ -74,15 +74,26 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
 
   useEffect(() => {
     if (open && itemToEdit) {
-      // Cast to TaskItem to access task-specific fields
-      const taskItem = itemToEdit as TaskItem;
-      setFormState({
-        name: itemToEdit.name,
-        description: taskItem.description || '',
-        priority: taskItem.priority || 'medium',
-        category: taskItem.category as TaskCategory || 'general',
-        dueDate: taskItem.dueDate ? new Date(taskItem.dueDate) : undefined,
-      });
+      // Check if it's a TaskItem by checking for the priority property
+      if ('priority' in itemToEdit) {
+        const taskItem = itemToEdit as TaskItem;
+        setFormState({
+          name: itemToEdit.name,
+          description: taskItem.description || '',
+          priority: taskItem.priority,
+          category: taskItem.category,
+          dueDate: taskItem.dueDate ? new Date(taskItem.dueDate) : undefined,
+        });
+      } else {
+        // Handle case where a ShoppingItem is being edited as a TaskItem
+        setFormState({
+          name: itemToEdit.name,
+          description: '',
+          priority: 'medium',
+          category: 'general',
+          dueDate: undefined,
+        });
+      }
     } else if (!open) {
       // Reset form when dialog closes
       setFormState({
@@ -122,13 +133,12 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
     
     if (!formState.name.trim() || !listId) return;
     
-    const taskData = {
+    const taskData: Omit<TaskItem, 'id'> = {
       name: formState.name.trim(),
       description: formState.description,
       priority: formState.priority,
       category: formState.category,
       dueDate: formState.dueDate,
-      // Add these properties as they're expected by the ShoppingItem interface
       quantity: 1,
       unit: 'un',
       price: 0,

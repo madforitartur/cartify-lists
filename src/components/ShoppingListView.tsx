@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -205,7 +204,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       ) : (
         <div className="space-y-2">
           {itemsToDisplay.map(item => {
-            // Check if it's a task item by checking for the priority property
             const isTaskItem = 'priority' in item;
             
             return mode === 'shopping' && !isTaskItem ? (

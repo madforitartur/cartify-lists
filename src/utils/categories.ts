@@ -1,7 +1,7 @@
 
 import { Category } from '@/types';
 import { 
-  Apple, Beef, Milk, ShoppingBag, Cake, Wine, ShoppingBasket
+  Apple, Beef, Milk, ShoppingBag, Cake, Wine, ShoppingBasket, Carrot
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -16,6 +16,11 @@ export const CATEGORIES: Record<Category, CategoryInfo> = {
     label: 'Frutas',
     icon: Apple,
     className: 'bg-category-fruits/10 text-category-fruits border-category-fruits/20'
+  },
+  vegetables: {
+    label: 'Vegetais',
+    icon: Carrot,
+    className: 'bg-category-vegetables/10 text-category-vegetables border-category-vegetables/20'
   },
   dairy: {
     label: 'Laticínios',
