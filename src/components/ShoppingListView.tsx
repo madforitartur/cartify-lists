@@ -12,7 +12,7 @@ import ShoppingListItem from './ShoppingListItem';
 import TaskListItem from './TaskListItem';
 import AddEditItemDialog from './AddEditItemDialog';
 import { formatCurrency } from '@/utils/formatters';
-import { ShoppingItem, TaskItem } from '@/types';
+import { ShoppingItem, TaskItem, ListWithItems, ShoppingListWithItems, TaskListWithItems } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppMode } from '@/contexts/AppModeContext';
 
@@ -67,9 +67,20 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
     setAddEditItemDialogOpen(true);
   };
 
-  const filteredItems = activeList.items.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Type guard to check if we're dealing with a task list
+  const isTaskList = (list: ListWithItems): list is TaskListWithItems => {
+    return list.listType === 'tasks';
+  };
+
+  // Type guard to check if we're dealing with a shopping list
+  const isShoppingList = (list: ListWithItems): list is ShoppingListWithItems => {
+    return list.listType === 'shopping';
+  };
+
+  // Get the filtered items based on the search term and active list type
+  const filteredItems = activeList ? 
+    activeList.items.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase())) : 
+    [];
 
   const pendingItems = filteredItems.filter(item => !item.completed);
   const completedItems = filteredItems.filter(item => item.completed);
@@ -217,30 +228,31 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       ) : (
         <div className="space-y-2">
-          {itemsToDisplay.map(item => {
-            const isTaskItem = 'priority' in item;
-            
-            if (isTaskMode && isTaskItem) {
-              return (
-                <TaskListItem 
-                  key={item.id}
-                  item={item as TaskItem}
-                  listId={activeList.id}
-                  onEdit={() => handleEditItem(item)}
-                />
-              );
-            } else if (!isTaskMode && !isTaskItem) {
-              return (
-                <ShoppingListItem 
-                  key={item.id} 
-                  item={item as ShoppingItem} 
-                  listId={activeList.id}
-                  onEdit={() => handleEditItem(item)}
-                />
-              );
-            }
-            return null;
-          })}
+          {isShoppingList(activeList) && !isTaskMode && activeList.items.map(item => (
+            <ShoppingListItem 
+              key={item.id} 
+              item={item} 
+              listId={activeList.id}
+              onEdit={() => handleEditItem(item)}
+            />
+          ))}
+          
+          {isTaskList(activeList) && isTaskMode && activeList.items
+            .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter(item => {
+              if (activeTab === 'pending') return !item.completed;
+              if (activeTab === 'completed') return item.completed;
+              return true;
+            })
+            .map(item => (
+              <TaskListItem 
+                key={item.id}
+                item={item}
+                listId={activeList.id}
+                onEdit={() => handleEditItem(item)}
+              />
+            ))
+          }
         </div>
       )}
 

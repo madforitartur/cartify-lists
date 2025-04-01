@@ -29,13 +29,26 @@ export interface TaskItem extends BaseItem {
 
 export type ListType = 'shopping' | 'tasks';
 
+// Updated to indicate that a shopping list can only have shopping items,
+// and a tasks list can only have task items
 export interface ShoppingList {
   id: string;
   name: string;
-  items: ShoppingItem[] | TaskItem[];
   createdAt: Date | string;
   updatedAt: Date | string;
   listType: ListType;
 }
+
+export interface ShoppingListWithItems extends ShoppingList {
+  items: ShoppingItem[];
+  listType: 'shopping';
+}
+
+export interface TaskListWithItems extends ShoppingList {
+  items: TaskItem[];
+  listType: 'tasks';
+}
+
+export type ListWithItems = ShoppingListWithItems | TaskListWithItems;
 
 export type AppMode = 'shopping' | 'tasks';

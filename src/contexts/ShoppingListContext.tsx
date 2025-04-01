@@ -1,23 +1,26 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory, ListType } from '@/types';
+import { 
+  ShoppingList, ShoppingItem, TaskItem, Category, ListType, 
+  ShoppingListWithItems, TaskListWithItems, ListWithItems 
+} from '@/types';
 import { toast } from "sonner";
 import { useAppMode } from './AppModeContext';
 
 interface ShoppingListContextType {
-  lists: ShoppingList[];
+  lists: ListWithItems[];
   activeListId: string | null;
   setActiveListId: (id: string | null) => void;
-  createList: (name: string) => ShoppingList;
+  createList: (name: string) => ListWithItems;
   updateList: (id: string, name: string) => void;
   deleteList: (id: string) => void;
   addItem: (listId: string, item: Omit<ShoppingItem | TaskItem, 'id'>) => void;
   updateItem: (listId: string, itemId: string, item: Partial<ShoppingItem | TaskItem>) => void;
   deleteItem: (listId: string, itemId: string) => void;
   toggleItemCompletion: (listId: string, itemId: string) => void;
-  getActiveList: () => ShoppingList | undefined;
+  getActiveList: () => ListWithItems | undefined;
   calculateTotalPrice: (listId: string) => number;
-  filteredLists: ShoppingList[];
+  filteredLists: ListWithItems[];
 }
 
 const ShoppingListContext = createContext<ShoppingListContextType | undefined>(undefined);
@@ -33,7 +36,7 @@ export const useShoppingList = () => {
 const STORAGE_KEY = 'cartify-shopping-lists';
 
 export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [lists, setLists] = useState<ShoppingList[]>([]);
+  const [lists, setLists] = useState<ListWithItems[]>([]);
   const [activeListId, setActiveListId] = useState<string | null>(null);
   const { mode } = useAppMode();
 
@@ -60,7 +63,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
           return list;
         });
         
-        setLists(updatedLists);
+        setLists(updatedLists as ListWithItems[]);
         
         if (updatedLists.length > 0 && !activeListId) {
           // Set active list based on current mode
@@ -94,20 +97,36 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Filter lists based on current mode
   const filteredLists = lists.filter(list => list.listType === mode);
 
-  const createList = (name: string): ShoppingList => {
-    const newList: ShoppingList = {
-      id: crypto.randomUUID(),
-      name,
-      items: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      listType: mode // Set listType based on current app mode
-    };
-
-    setLists(prev => [...prev, newList]);
-    setActiveListId(newList.id);
-    toast.success(`Lista "${name}" criada com sucesso!`);
-    return newList;
+  const createList = (name: string): ListWithItems => {
+    if (mode === 'shopping') {
+      const newList: ShoppingListWithItems = {
+        id: crypto.randomUUID(),
+        name,
+        items: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        listType: 'shopping'
+      };
+      
+      setLists(prev => [...prev, newList]);
+      setActiveListId(newList.id);
+      toast.success(`Lista "${name}" criada com sucesso!`);
+      return newList;
+    } else {
+      const newList: TaskListWithItems = {
+        id: crypto.randomUUID(),
+        name,
+        items: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        listType: 'tasks'
+      };
+      
+      setLists(prev => [...prev, newList]);
+      setActiveListId(newList.id);
+      toast.success(`Lista "${name}" criada com sucesso!`);
+      return newList;
+    }
   };
 
   const updateList = (id: string, name: string) => {
@@ -142,38 +161,60 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
 
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: [...list.items, newItem as ShoppingItem | TaskItem],
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        if (list.listType === 'shopping' && 'priority' in newItem) {
+          // Don't add task items to shopping lists
+          return list;
+        }
+        
+        if (list.listType === 'tasks' && !('priority' in newItem)) {
+          // Don't add shopping items to task lists
+          return list;
+        }
+        
+        if (list.listType === 'shopping') {
+          return {
+            ...list,
+            items: [...(list as ShoppingListWithItems).items, newItem as ShoppingItem],
+            updatedAt: new Date().toISOString()
+          } as ShoppingListWithItems;
+        } else {
+          return {
+            ...list,
+            items: [...(list as TaskListWithItems).items, newItem as TaskItem],
+            updatedAt: new Date().toISOString()
+          } as TaskListWithItems;
+        }
+      })
     );
     toast.success(`Item adicionado à lista!`);
   };
 
   const updateItem = (listId: string, itemId: string, updatedFields: Partial<ShoppingItem | TaskItem>) => {
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: list.items.map(item => 
-                item.id === itemId 
-                  ? { 
-                      ...item, 
-                      ...updatedFields,
-                      updatedAt: new Date().toISOString() 
-                    } 
-                  : item
-              ),
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        if (list.listType === 'shopping') {
+          return {
+            ...list,
+            items: (list as ShoppingListWithItems).items.map(item => 
+              item.id === itemId ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() } : item
+            ),
+            updatedAt: new Date().toISOString()
+          } as ShoppingListWithItems;
+        } else {
+          return {
+            ...list,
+            items: (list as TaskListWithItems).items.map(item => 
+              item.id === itemId ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() } : item
+            ),
+            updatedAt: new Date().toISOString()
+          } as TaskListWithItems;
+        }
+      })
     );
     toast.success(`Item atualizado com sucesso!`);
   };
@@ -182,18 +223,27 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const listIndex = lists.findIndex(list => list.id === listId);
     if (listIndex === -1) return;
     
-    const itemToDelete = lists[listIndex].items.find(item => item.id === itemId);
+    const list = lists[listIndex];
+    const itemToDelete = list.items.find(item => item.id === itemId);
     
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: list.items.filter(item => item.id !== itemId),
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        if (list.listType === 'shopping') {
+          return {
+            ...list,
+            items: (list as ShoppingListWithItems).items.filter(item => item.id !== itemId),
+            updatedAt: new Date().toISOString()
+          } as ShoppingListWithItems;
+        } else {
+          return {
+            ...list,
+            items: (list as TaskListWithItems).items.filter(item => item.id !== itemId),
+            updatedAt: new Date().toISOString()
+          } as TaskListWithItems;
+        }
+      })
     );
     
     toast.success(`Item "${itemToDelete?.name}" removido!`);
@@ -201,23 +251,27 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const toggleItemCompletion = (listId: string, itemId: string) => {
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: list.items.map(item => 
-                item.id === itemId 
-                  ? { 
-                      ...item, 
-                      completed: !item.completed,
-                      updatedAt: new Date().toISOString() 
-                    } 
-                  : item
-              ),
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        if (list.listType === 'shopping') {
+          return {
+            ...list,
+            items: (list as ShoppingListWithItems).items.map(item => 
+              item.id === itemId ? { ...item, completed: !item.completed, updatedAt: new Date().toISOString() } : item
+            ),
+            updatedAt: new Date().toISOString()
+          } as ShoppingListWithItems;
+        } else {
+          return {
+            ...list,
+            items: (list as TaskListWithItems).items.map(item => 
+              item.id === itemId ? { ...item, completed: !item.completed, updatedAt: new Date().toISOString() } : item
+            ),
+            updatedAt: new Date().toISOString()
+          } as TaskListWithItems;
+        }
+      })
     );
   };
 
