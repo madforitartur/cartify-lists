@@ -4,15 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Plus, ArrowLeft, Share2, Search, ShoppingBag, LayoutList, 
-  ShoppingBasket, Check 
+  ShoppingBasket, Check, CalendarClock, Clock
 } from 'lucide-react';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ShoppingListItem from './ShoppingListItem';
+import TaskListItem from './TaskListItem';
 import AddEditItemDialog from './AddEditItemDialog';
 import { formatCurrency } from '@/utils/formatters';
-import { ShoppingItem } from '@/types';
+import { ShoppingItem, AppMode } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAppMode } from '@/contexts/AppModeContext';
 
 interface ShoppingListViewProps {
   onBackToLists: () => void;
@@ -24,6 +26,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   const [addEditItemDialogOpen, setAddEditItemDialogOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<ShoppingItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('all');
+  const { mode } = useAppMode();
   
   const isMobile = useIsMobile();
   const activeList = getActiveList();
@@ -99,23 +102,41 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       </div>
       
-      {/* Total price card moved to the top */}
-      <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
-        <div>
-          <p className="text-sm text-muted-foreground">Valor Total Estimado</p>
-          <p className="text-2xl font-semibold">{formatCurrency(totalPrice)}</p>
+      {mode === 'shopping' ? (
+        // Shopping mode card
+        <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
+          <div>
+            <p className="text-sm text-muted-foreground">Valor Total Estimado</p>
+            <p className="text-2xl font-semibold">{formatCurrency(totalPrice)}</p>
+          </div>
+          <Button onClick={handleAddItem}>
+            <Plus className="mr-2 h-4 w-4" />
+            Adicionar Item
+          </Button>
         </div>
-        <Button onClick={handleAddItem}>
-          <Plus className="mr-2 h-4 w-4" />
-          Adicionar Item
-        </Button>
-      </div>
+      ) : (
+        // Tasks mode card
+        <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
+          <div>
+            <p className="text-sm text-muted-foreground">Progresso</p>
+            <p className="text-2xl font-semibold">
+              {completedItems.length > 0 
+                ? Math.round((completedItems.length / filteredItems.length) * 100)
+                : 0}%
+            </p>
+          </div>
+          <Button onClick={handleAddItem}>
+            <Plus className="mr-2 h-4 w-4" />
+            Adicionar Tarefa
+          </Button>
+        </div>
+      )}
 
       <div className="mb-6">
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar itens..."
+            placeholder={mode === 'shopping' ? "Buscar itens..." : "Buscar tarefas..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -129,7 +150,11 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
               Todos ({filteredItems.length})
             </TabsTrigger>
             <TabsTrigger value="pending" className="flex items-center">
-              <ShoppingBag className="mr-2 h-4 w-4" />
+              {mode === 'shopping' ? (
+                <ShoppingBag className="mr-2 h-4 w-4" />
+              ) : (
+                <Clock className="mr-2 h-4 w-4" />
+              )}
               Pendentes ({pendingItems.length})
             </TabsTrigger>
             <TabsTrigger value="completed" className="flex items-center">
@@ -142,10 +167,15 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
 
       {itemsToDisplay.length === 0 ? (
         <div className="text-center py-12 bg-muted/20 rounded-lg border border-dashed">
-          <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+          {mode === 'shopping' ? (
+            <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+          ) : (
+            <CheckSquare className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+          )}
+          
           {searchTerm ? (
             <>
-              <h3 className="text-lg font-medium">Nenhum item encontrado</h3>
+              <h3 className="text-lg font-medium">Nenhum {mode === 'shopping' ? 'item' : 'tarefa'} encontrado</h3>
               <p className="text-muted-foreground">
                 Tente mudar os termos da busca
               </p>
@@ -154,11 +184,11 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
             <>
               <h3 className="text-lg font-medium">Lista vazia</h3>
               <p className="text-muted-foreground mb-4">
-                Adicione itens à sua lista de compras
+                Adicione {mode === 'shopping' ? 'itens à sua lista de compras' : 'tarefas à sua lista'}
               </p>
               <Button onClick={handleAddItem}>
                 <Plus className="mr-2 h-4 w-4" />
-                Adicionar Item
+                Adicionar {mode === 'shopping' ? 'Item' : 'Tarefa'}
               </Button>
             </>
           )}
@@ -166,12 +196,21 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       ) : (
         <div className="space-y-2">
           {itemsToDisplay.map(item => (
-            <ShoppingListItem 
-              key={item.id} 
-              item={item} 
-              listId={activeList.id}
-              onEdit={handleEditItem}
-            />
+            mode === 'shopping' ? (
+              <ShoppingListItem 
+                key={item.id} 
+                item={item as ShoppingItem} 
+                listId={activeList.id}
+                onEdit={handleEditItem}
+              />
+            ) : (
+              <TaskListItem 
+                key={item.id}
+                item={item as any} // Will be properly typed after full implementation
+                listId={activeList.id}
+                onEdit={() => {}} // Will implement task edit functionality
+              />
+            )
           ))}
         </div>
       )}
@@ -181,6 +220,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         onOpenChange={setAddEditItemDialogOpen}
         listId={activeListId}
         itemToEdit={itemToEdit}
+        mode={mode}
       />
     </div>
   );

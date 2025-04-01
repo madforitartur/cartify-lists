@@ -7,6 +7,8 @@ import ShoppingListView from '@/components/ShoppingListView';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Github } from 'lucide-react';
 import { useActiveListNavigation } from '@/hooks/use-active-list-navigation';
+import AppModeToggle from '@/components/AppModeToggle';
+import { useAppMode } from '@/contexts/AppModeContext';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -24,6 +26,7 @@ const AppContent: React.FC<{
   setShowLists: (show: boolean) => void;
 }> = ({ showLists, setShowLists }) => {
   const isMobile = useIsMobile();
+  const { mode } = useAppMode();
   
   // This hook handles the navigation on mobile when an active list is selected
   useActiveListNavigation(showLists, setShowLists);
@@ -51,6 +54,11 @@ const AppContent: React.FC<{
       </header>
       
       <main className="max-w-7xl mx-auto">
+        {/* Mode Toggle */}
+        <div className="px-4 py-3">
+          <AppModeToggle />
+        </div>
+        
         {isMobile ? (
           // Mobile layout - Show either lists or active list
           showLists ? (
