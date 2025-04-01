@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  ShoppingList, ShoppingItem, TaskItem, Category, ListType, 
+  BaseList, ShoppingItem, TaskItem, ListType, 
   ShoppingListWithItems, TaskListWithItems, ListWithItems 
 } from '@/types';
 import { toast } from "sonner";
@@ -67,7 +67,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
         
         if (updatedLists.length > 0 && !activeListId) {
           // Set active list based on current mode
-          const listForCurrentMode = updatedLists.find((list: ShoppingList) => list.listType === mode);
+          const listForCurrentMode = updatedLists.find((list: BaseList) => list.listType === mode);
           setActiveListId(listForCurrentMode?.id || updatedLists[0].id);
         }
       } catch (e) {
@@ -166,21 +166,25 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
         
         if (list.listType === 'shopping' && 'priority' in newItem) {
           // Don't add task items to shopping lists
+          toast.error("Não é possível adicionar tarefas a uma lista de compras");
           return list;
         }
         
         if (list.listType === 'tasks' && !('priority' in newItem)) {
           // Don't add shopping items to task lists
+          toast.error("Não é possível adicionar itens de compras a uma lista de tarefas");
           return list;
         }
         
         if (list.listType === 'shopping') {
+          // TypeScript knows this is a shopping list
           return {
             ...list,
             items: [...(list as ShoppingListWithItems).items, newItem as ShoppingItem],
             updatedAt: new Date().toISOString()
           } as ShoppingListWithItems;
         } else {
+          // TypeScript knows this is a task list
           return {
             ...list,
             items: [...(list as TaskListWithItems).items, newItem as TaskItem],
