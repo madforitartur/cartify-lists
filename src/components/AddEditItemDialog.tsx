@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { 
   Dialog, 
@@ -17,16 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ShoppingItem, Category } from '@/types';
+import { ShoppingItem, Category, AppMode } from '@/types';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
 import { getCategoryOptions, CATEGORIES } from '@/utils/categories';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAppMode } from '@/contexts/AppModeContext';
 
 interface AddEditItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   listId: string | null;
   itemToEdit?: ShoppingItem;
+  mode?: AppMode;
 }
 
 const UNITS = ['un', 'kg', 'g', 'l', 'ml', 'pct'];
@@ -35,7 +36,8 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   open, 
   onOpenChange,
   listId,
-  itemToEdit
+  itemToEdit,
+  mode: propMode
 }) => {
   const [formState, setFormState] = React.useState({
     name: '',
@@ -52,6 +54,10 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   const isEditMode = !!itemToEdit;
   const categoryOptions = getCategoryOptions();
   const isMobile = useIsMobile();
+  const { mode: contextMode } = useAppMode();
+  
+  // Use the mode from props if provided, otherwise use the context mode
+  const mode = propMode || contextMode;
 
   useEffect(() => {
     if (open && itemToEdit) {
@@ -161,7 +167,10 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
-              {isEditMode ? 'Editar Item' : 'Adicionar Item'}
+              {isEditMode 
+                ? mode === 'shopping' ? 'Editar Item' : 'Editar Tarefa' 
+                : mode === 'shopping' ? 'Adicionar Item' : 'Adicionar Tarefa'
+              }
             </DialogTitle>
           </DialogHeader>
           

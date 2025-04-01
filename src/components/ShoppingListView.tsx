@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Plus, ArrowLeft, Share2, Search, ShoppingBag, LayoutList, 
-  ShoppingBasket, Check, CalendarClock, Clock
+  ShoppingBasket, Check, CalendarClock, Clock, CheckSquare
 } from 'lucide-react';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -46,7 +45,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   }
 
   const handleBackToLists = () => {
-    // Clear active list selection when going back to lists
     setActiveListId(null);
     onBackToLists();
   };
@@ -103,7 +101,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       </div>
       
       {mode === 'shopping' ? (
-        // Shopping mode card
         <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
           <div>
             <p className="text-sm text-muted-foreground">Valor Total Estimado</p>
@@ -115,7 +112,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
           </Button>
         </div>
       ) : (
-        // Tasks mode card
         <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
           <div>
             <p className="text-sm text-muted-foreground">Progresso</p>
@@ -220,7 +216,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         onOpenChange={setAddEditItemDialogOpen}
         listId={activeListId}
         itemToEdit={itemToEdit}
-        mode={mode}
       />
     </div>
   );
