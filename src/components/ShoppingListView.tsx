@@ -121,7 +121,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
                 : 0}%
             </p>
           </div>
-          <Button onClick={handleAddItem}>
+          <Button onClick={handleAddItem} className="bg-orange-500 hover:bg-orange-600">
             <Plus className="mr-2 h-4 w-4" />
             Adicionar Tarefa
           </Button>
@@ -140,12 +140,18 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="all" className="flex items-center">
+          <TabsList className={`grid grid-cols-3 mb-4 ${mode === 'tasks' ? 'bg-orange-100' : ''}`}>
+            <TabsTrigger 
+              value="all" 
+              className={`flex items-center ${mode === 'tasks' ? 'data-[state=active]:bg-orange-50 data-[state=active]:text-orange-900' : ''}`}
+            >
               <LayoutList className="mr-2 h-4 w-4" />
               Todos ({filteredItems.length})
             </TabsTrigger>
-            <TabsTrigger value="pending" className="flex items-center">
+            <TabsTrigger 
+              value="pending" 
+              className={`flex items-center ${mode === 'tasks' ? 'data-[state=active]:bg-orange-50 data-[state=active]:text-orange-900' : ''}`}
+            >
               {mode === 'shopping' ? (
                 <ShoppingBag className="mr-2 h-4 w-4" />
               ) : (
@@ -153,7 +159,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
               )}
               Pendentes ({pendingItems.length})
             </TabsTrigger>
-            <TabsTrigger value="completed" className="flex items-center">
+            <TabsTrigger 
+              value="completed" 
+              className={`flex items-center ${mode === 'tasks' ? 'data-[state=active]:bg-orange-50 data-[state=active]:text-orange-900' : ''}`}
+            >
               <Check className="mr-2 h-4 w-4" />
               Concluídos ({completedItems.length})
             </TabsTrigger>
@@ -166,7 +175,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
           {mode === 'shopping' ? (
             <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
           ) : (
-            <CheckSquare className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+            <CheckSquare className="mx-auto h-12 w-12 text-orange-500 mb-3" />
           )}
           
           {searchTerm ? (
@@ -182,7 +191,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
               <p className="text-muted-foreground mb-4">
                 Adicione {mode === 'shopping' ? 'itens à sua lista de compras' : 'tarefas à sua lista'}
               </p>
-              <Button onClick={handleAddItem}>
+              <Button 
+                onClick={handleAddItem}
+                className={mode === 'tasks' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Adicionar {mode === 'shopping' ? 'Item' : 'Tarefa'}
               </Button>
@@ -204,7 +216,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
                 key={item.id}
                 item={item as any} // Will be properly typed after full implementation
                 listId={activeList.id}
-                onEdit={() => {}} // Will implement task edit functionality
+                onEdit={() => handleEditItem(item)}
               />
             )
           ))}
@@ -216,6 +228,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         onOpenChange={setAddEditItemDialogOpen}
         listId={activeListId}
         itemToEdit={itemToEdit}
+        mode={mode}
       />
     </div>
   );

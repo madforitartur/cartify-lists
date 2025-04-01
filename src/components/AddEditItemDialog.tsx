@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { 
   Dialog, 
@@ -21,6 +22,7 @@ import { useShoppingList } from '@/contexts/ShoppingListContext';
 import { getCategoryOptions, CATEGORIES } from '@/utils/categories';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAppMode } from '@/contexts/AppModeContext';
+import AddEditTaskDialog from './AddEditTaskDialog';
 
 interface AddEditItemDialogProps {
   open: boolean;
@@ -58,6 +60,18 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   
   // Use the mode from props if provided, otherwise use the context mode
   const mode = propMode || contextMode;
+
+  // If in task mode, render the task dialog instead
+  if (mode === 'tasks') {
+    return (
+      <AddEditTaskDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        listId={listId}
+        itemToEdit={itemToEdit}
+      />
+    );
+  }
 
   useEffect(() => {
     if (open && itemToEdit) {
@@ -167,10 +181,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
-              {isEditMode 
-                ? mode === 'shopping' ? 'Editar Item' : 'Editar Tarefa' 
-                : mode === 'shopping' ? 'Adicionar Item' : 'Adicionar Tarefa'
-              }
+              {isEditMode ? 'Editar Item' : 'Adicionar Item'}
             </DialogTitle>
           </DialogHeader>
           
