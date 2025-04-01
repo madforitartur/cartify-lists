@@ -28,7 +28,7 @@ const AppModeToggle: React.FC = () => {
         <ToggleGroupItem 
           value="tasks" 
           aria-label="Modo Tarefas"
-          className="flex-1 rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          className="flex-1 rounded-full data-[state=on]:bg-orange-500 data-[state=on]:text-white"
         >
           <CheckSquare className="mr-2 h-4 w-4" />
           Tarefas

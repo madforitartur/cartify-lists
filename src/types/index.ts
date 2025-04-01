@@ -27,12 +27,15 @@ export interface TaskItem extends BaseItem {
   dueDate?: Date | string;
 }
 
+export type ListType = 'shopping' | 'tasks';
+
 export interface ShoppingList {
   id: string;
   name: string;
   items: ShoppingItem[] | TaskItem[];
   createdAt: Date | string;
   updatedAt: Date | string;
+  listType: ListType;
 }
 
 export type AppMode = 'shopping' | 'tasks';

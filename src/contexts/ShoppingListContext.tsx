@@ -1,6 +1,8 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory } from '@/types';
+import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory, ListType } from '@/types';
 import { toast } from "sonner";
+import { useAppMode } from './AppModeContext';
 
 interface ShoppingListContextType {
   lists: ShoppingList[];
@@ -15,6 +17,7 @@ interface ShoppingListContextType {
   toggleItemCompletion: (listId: string, itemId: string) => void;
   getActiveList: () => ShoppingList | undefined;
   calculateTotalPrice: (listId: string) => number;
+  filteredLists: ShoppingList[];
 }
 
 const ShoppingListContext = createContext<ShoppingListContextType | undefined>(undefined);
@@ -32,16 +35,37 @@ const STORAGE_KEY = 'cartify-shopping-lists';
 export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [activeListId, setActiveListId] = useState<string | null>(null);
+  const { mode } = useAppMode();
 
   useEffect(() => {
     const storedLists = localStorage.getItem(STORAGE_KEY);
     if (storedLists) {
       try {
         const parsedLists = JSON.parse(storedLists);
-        setLists(parsedLists);
         
-        if (parsedLists.length > 0 && !activeListId) {
-          setActiveListId(parsedLists[0].id);
+        // Add listType field to existing lists if missing
+        const updatedLists = parsedLists.map((list: any) => {
+          if (!list.listType) {
+            // For backward compatibility, determine list type based on item categories
+            const hasTaskItems = list.items.some((item: any) => 
+              item.priority !== undefined || 
+              (item.category !== undefined && 
+               ['general', 'work', 'personal', 'health', 'education', 'home'].includes(item.category)));
+            
+            return {
+              ...list,
+              listType: hasTaskItems ? 'tasks' : 'shopping'
+            };
+          }
+          return list;
+        });
+        
+        setLists(updatedLists);
+        
+        if (updatedLists.length > 0 && !activeListId) {
+          // Set active list based on current mode
+          const listForCurrentMode = updatedLists.find((list: ShoppingList) => list.listType === mode);
+          setActiveListId(listForCurrentMode?.id || updatedLists[0].id);
         }
       } catch (e) {
         console.error('Error parsing stored lists:', e);
@@ -50,9 +74,25 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, []);
 
+  // When mode changes, update activeListId if needed
+  useEffect(() => {
+    if (lists.length > 0) {
+      const currentActiveList = lists.find(list => list.id === activeListId);
+      if (!currentActiveList || currentActiveList.listType !== mode) {
+        const listForCurrentMode = lists.find(list => list.listType === mode);
+        if (listForCurrentMode) {
+          setActiveListId(listForCurrentMode.id);
+        }
+      }
+    }
+  }, [mode, lists, activeListId]);
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
   }, [lists]);
+
+  // Filter lists based on current mode
+  const filteredLists = lists.filter(list => list.listType === mode);
 
   const createList = (name: string): ShoppingList => {
     const newList: ShoppingList = {
@@ -61,6 +101,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
       items: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      listType: mode // Set listType based on current app mode
     };
 
     setLists(prev => [...prev, newList]);
@@ -86,7 +127,8 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setLists(prev => prev.filter(list => list.id !== id));
     
     if (activeListId === id) {
-      const remainingLists = lists.filter(list => list.id !== id);
+      // Find another list of the same type
+      const remainingLists = lists.filter(list => list.id !== id && list.listType === mode);
       setActiveListId(remainingLists.length > 0 ? remainingLists[0].id : null);
     }
     
@@ -127,7 +169,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
                       updatedAt: new Date().toISOString() 
                     } 
                   : item
-              ) as (ShoppingItem | TaskItem)[],
+              ),
               updatedAt: new Date().toISOString() 
             } 
           : list
@@ -187,7 +229,9 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const list = lists.find(list => list.id === listId);
     if (!list) return 0;
     
-    return list.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return list.items.reduce((total, item) => {
+      return total + (item.price * item.quantity);
+    }, 0);
   };
 
   return (
@@ -204,7 +248,8 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
         deleteItem, 
         toggleItemCompletion,
         getActiveList,
-        calculateTotalPrice
+        calculateTotalPrice,
+        filteredLists
       }}
     >
       {children}
