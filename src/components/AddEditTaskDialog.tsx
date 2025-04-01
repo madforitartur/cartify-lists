@@ -35,7 +35,7 @@ interface AddEditTaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   listId: string | null;
-  itemToEdit?: ShoppingItem;
+  itemToEdit?: ShoppingItem | TaskItem;
 }
 
 const PRIORITIES: { value: Priority; label: string }[] = [
@@ -75,7 +75,7 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
   useEffect(() => {
     if (open && itemToEdit) {
       // Cast to TaskItem to access task-specific fields
-      const taskItem = itemToEdit as unknown as TaskItem;
+      const taskItem = itemToEdit as TaskItem;
       setFormState({
         name: itemToEdit.name,
         description: taskItem.description || '',
@@ -133,7 +133,7 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
       unit: 'un',
       price: 0,
       completed: isEditMode ? (itemToEdit?.completed || false) : false
-    } as unknown as ShoppingItem; // Cast to ShoppingItem for compatibility with context
+    };
     
     if (isEditMode && itemToEdit) {
       updateItem(listId, itemToEdit.id, taskData);

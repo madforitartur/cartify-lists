@@ -41,6 +41,14 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   itemToEdit,
   mode: propMode
 }) => {
+  // First, determine which mode we're in
+  const { mode: contextMode } = useAppMode();
+  // Use the mode from props if provided, otherwise use the context mode
+  const mode = propMode || contextMode;
+
+  // If we're in task mode, render the task dialog instead
+  // IMPORTANT: This check must be AFTER all hook calls to satisfy React's Rules of Hooks
+  // We need to define all hooks here first, regardless of which UI gets rendered
   const [formState, setFormState] = React.useState({
     name: '',
     quantity: 1,
@@ -56,10 +64,6 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   const isEditMode = !!itemToEdit;
   const categoryOptions = getCategoryOptions();
   const isMobile = useIsMobile();
-  const { mode: contextMode } = useAppMode();
-  
-  // Use the mode from props if provided, otherwise use the context mode
-  const mode = propMode || contextMode;
 
   useEffect(() => {
     if (open && itemToEdit) {
@@ -68,7 +72,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
         quantity: itemToEdit.quantity,
         unit: itemToEdit.unit,
         price: itemToEdit.price,
-        category: itemToEdit.category
+        category: itemToEdit.category as Category
       });
       // Apenas definir o priceInput se o preço for maior que zero
       setPriceInput(itemToEdit.price > 0 ? itemToEdit.price.toFixed(2) : '');
@@ -85,8 +89,7 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
     }
   }, [open, itemToEdit]);
 
-  // Important: Move this conditional rendering to the return statement
-  // to avoid breaking the Rules of Hooks
+  // Conditional return AFTER all hooks are defined
   if (mode === 'tasks') {
     return (
       <AddEditTaskDialog

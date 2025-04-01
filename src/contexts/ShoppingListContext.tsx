@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ShoppingList, ShoppingItem, Category } from '@/types';
+import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem } from '@/types';
 // Replace the incorrect import with the correct sonner import
 import { toast } from "sonner";
 
@@ -11,8 +11,8 @@ interface ShoppingListContextType {
   createList: (name: string) => ShoppingList;
   updateList: (id: string, name: string) => void;
   deleteList: (id: string) => void;
-  addItem: (listId: string, item: Omit<ShoppingItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateItem: (listId: string, itemId: string, item: Partial<ShoppingItem>) => void;
+  addItem: (listId: string, item: Omit<ShoppingItem | TaskItem, 'id'>) => void;
+  updateItem: (listId: string, itemId: string, item: Partial<ShoppingItem | TaskItem>) => void;
   deleteItem: (listId: string, itemId: string) => void;
   toggleItemCompletion: (listId: string, itemId: string) => void;
   getActiveList: () => ShoppingList | undefined;
@@ -100,12 +100,10 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     toast.success(`Lista "${listToDelete?.name}" removida!`);
   };
 
-  const addItem = (listId: string, item: Omit<ShoppingItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newItem: ShoppingItem = {
+  const addItem = (listId: string, item: Omit<ShoppingItem | TaskItem, 'id'>) => {
+    const newItem = {
       ...item,
       id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
     setLists(prev => 
@@ -122,7 +120,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     toast.success(`Item adicionado à lista!`);
   };
 
-  const updateItem = (listId: string, itemId: string, updatedFields: Partial<ShoppingItem>) => {
+  const updateItem = (listId: string, itemId: string, updatedFields: Partial<ShoppingItem | TaskItem>) => {
     setLists(prev => 
       prev.map(list => 
         list.id === listId 

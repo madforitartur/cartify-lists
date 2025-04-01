@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,7 @@ import ShoppingListItem from './ShoppingListItem';
 import TaskListItem from './TaskListItem';
 import AddEditItemDialog from './AddEditItemDialog';
 import { formatCurrency } from '@/utils/formatters';
-import { ShoppingItem, AppMode } from '@/types';
+import { ShoppingItem, TaskItem, AppMode } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppMode } from '@/contexts/AppModeContext';
 
@@ -23,7 +24,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   const { activeListId, getActiveList, calculateTotalPrice, setActiveListId } = useShoppingList();
   const [searchTerm, setSearchTerm] = useState('');
   const [addEditItemDialogOpen, setAddEditItemDialogOpen] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState<ShoppingItem | undefined>(undefined);
+  const [itemToEdit, setItemToEdit] = useState<ShoppingItem | TaskItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('all');
   const { mode } = useAppMode();
   
@@ -54,7 +55,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
     setAddEditItemDialogOpen(true);
   };
 
-  const handleEditItem = (item: ShoppingItem) => {
+  const handleEditItem = (item: ShoppingItem | TaskItem) => {
     setItemToEdit(item);
     setAddEditItemDialogOpen(true);
   };
@@ -203,23 +204,26 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       ) : (
         <div className="space-y-2">
-          {itemsToDisplay.map(item => (
-            mode === 'shopping' ? (
+          {itemsToDisplay.map(item => {
+            // Check if it's a task item by checking for the priority property
+            const isTaskItem = 'priority' in item;
+            
+            return mode === 'shopping' && !isTaskItem ? (
               <ShoppingListItem 
                 key={item.id} 
                 item={item as ShoppingItem} 
                 listId={activeList.id}
-                onEdit={handleEditItem}
+                onEdit={() => handleEditItem(item)}
               />
             ) : (
               <TaskListItem 
                 key={item.id}
-                item={item as any} // Will be properly typed after full implementation
+                item={item as TaskItem}
                 listId={activeList.id}
                 onEdit={() => handleEditItem(item)}
               />
-            )
-          ))}
+            );
+          })}
         </div>
       )}
 

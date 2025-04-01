@@ -5,26 +5,25 @@ export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
 export type TaskCategory = 'general' | 'work' | 'personal' | 'health' | 'education' | 'home';
 
-export interface ShoppingItem {
+export interface BaseItem {
   id: string;
   name: string;
   quantity: number;
   unit: string;
   price: number;
-  category: Category;
   completed: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface TaskItem {
-  id: string;
-  name: string;
+export interface ShoppingItem extends BaseItem {
+  category: Category;
+}
+
+export interface TaskItem extends BaseItem {
   description?: string;
-  quantity: number;
-  unit: string;
-  price: number;
   priority: Priority;
   category: TaskCategory;
-  completed: boolean;
   dueDate?: Date | string;
 }
 
