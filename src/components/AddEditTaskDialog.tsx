@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { 
   Dialog, 
@@ -127,12 +128,12 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
       priority: formState.priority,
       category: formState.category,
       dueDate: formState.dueDate,
-      // Keep original properties required by ShoppingItem
+      // Add these properties as they're expected by the ShoppingItem interface
       quantity: 1,
       unit: 'un',
       price: 0,
       completed: isEditMode ? (itemToEdit?.completed || false) : false
-    };
+    } as unknown as ShoppingItem; // Cast to ShoppingItem for compatibility with context
     
     if (isEditMode && itemToEdit) {
       updateItem(listId, itemToEdit.id, taskData);

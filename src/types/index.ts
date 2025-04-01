@@ -15,19 +15,25 @@ export interface ShoppingItem {
   completed: boolean;
 }
 
-export interface TaskItem extends ShoppingItem {
+export interface TaskItem {
+  id: string;
+  name: string;
   description?: string;
+  quantity: number;
+  unit: string;
+  price: number;
   priority: Priority;
   category: TaskCategory;
+  completed: boolean;
   dueDate?: Date | string;
 }
 
 export interface ShoppingList {
   id: string;
   name: string;
-  items: ShoppingItem[];
-  createdAt: Date;
-  updatedAt: Date;
+  items: ShoppingItem[] | TaskItem[];
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export type AppMode = 'shopping' | 'tasks';

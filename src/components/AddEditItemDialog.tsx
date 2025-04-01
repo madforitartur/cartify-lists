@@ -61,18 +61,6 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   // Use the mode from props if provided, otherwise use the context mode
   const mode = propMode || contextMode;
 
-  // If in task mode, render the task dialog instead
-  if (mode === 'tasks') {
-    return (
-      <AddEditTaskDialog
-        open={open}
-        onOpenChange={onOpenChange}
-        listId={listId}
-        itemToEdit={itemToEdit}
-      />
-    );
-  }
-
   useEffect(() => {
     if (open && itemToEdit) {
       setFormState({
@@ -96,6 +84,19 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
       setPriceInput(''); // Resetar para vazio
     }
   }, [open, itemToEdit]);
+
+  // Important: Move this conditional rendering to the return statement
+  // to avoid breaking the Rules of Hooks
+  if (mode === 'tasks') {
+    return (
+      <AddEditTaskDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        listId={listId}
+        itemToEdit={itemToEdit}
+      />
+    );
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
