@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, ShoppingCart } from 'lucide-react';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import ListSelectorCard from './ListSelectorCard';
 import AddEditListDialog from './AddEditListDialog';
 

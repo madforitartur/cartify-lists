@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ShoppingItem, Category } from '@/types';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Edit2, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 import { CATEGORIES } from '@/utils/categories';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 
 interface ShoppingListItemProps {
   item: ShoppingItem;

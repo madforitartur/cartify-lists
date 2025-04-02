@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ShoppingList } from '@/types';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AddEditListDialogProps {

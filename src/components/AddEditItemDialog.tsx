@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ShoppingItem, Category, AppMode } from '@/types';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import { getCategoryOptions, CATEGORIES } from '@/utils/categories';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAppMode } from '@/contexts/AppModeContext';

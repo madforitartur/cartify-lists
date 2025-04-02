@@ -4,7 +4,7 @@ import { TaskItem, Priority, TaskCategory } from '@/types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Edit2, Trash2, Flag, CalendarClock } from 'lucide-react';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

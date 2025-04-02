@@ -25,7 +25,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { ShoppingItem, TaskItem, Priority, TaskCategory } from '@/types';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

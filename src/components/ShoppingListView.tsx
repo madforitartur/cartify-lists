@@ -6,7 +6,7 @@ import {
   Plus, Search, ShoppingBag, LayoutList, 
   ShoppingBasket, Check, CheckSquare
 } from 'lucide-react';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ShoppingListItem from './ShoppingListItem';
 import TaskListItem from './TaskListItem';

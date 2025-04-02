@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ShoppingListProvider } from '@/contexts/ShoppingListContext';
+import { ShoppingListProvider } from '@/contexts/shopping-list';
 import ListSelector from '@/components/ListSelector';
 import ShoppingListView from '@/components/ShoppingListView';
 import { Button } from '@/components/ui/button';

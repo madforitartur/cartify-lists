@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { ShoppingList } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { ShoppingBasket, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/utils/formatters';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 
 interface ListSelectorCardProps {
   list: ShoppingList;
