@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Plus, ArrowLeft, Share2, Search, ShoppingBag, LayoutList, 
-  ShoppingBasket, Check, CalendarClock, Clock, CheckSquare
+  ShoppingBasket, Check, CheckSquare
 } from 'lucide-react';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,6 +15,8 @@ import { formatCurrency } from '@/utils/formatters';
 import { ShoppingItem, TaskItem, AppMode } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppMode } from '@/contexts/AppModeContext';
+import ListViewHeader from './ListViewHeader';
+import ListViewSummary from './ListViewSummary';
 
 interface ShoppingListViewProps {
   onBackToLists: () => void;
@@ -78,55 +81,26 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   };
 
   const itemsToDisplay = getItemsToDisplay();
+  
+  // Check if the current item is a TaskItem
+  const isTaskItem = (item: ShoppingItem | TaskItem): item is TaskItem => {
+    return 'priority' in item;
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={handleBackToLists} className="mr-2">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h2 className="text-2xl font-semibold">{activeList.name}</h2>
-            <p className="text-muted-foreground">
-              {pendingItems.length} pendentes • {completedItems.length} concluídos
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon">
-            <Share2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <ListViewHeader 
+        activeList={activeList}
+        pendingItems={pendingItems.length}
+        completedItems={completedItems.length}
+        handleBackToLists={handleBackToLists}
+      />
       
-      {mode === 'shopping' ? (
-        <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
-          <div>
-            <p className="text-sm text-muted-foreground">Valor Total Estimado</p>
-            <p className="text-2xl font-semibold">{formatCurrency(totalPrice)}</p>
-          </div>
-          <Button onClick={handleAddItem}>
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Item
-          </Button>
-        </div>
-      ) : (
-        <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
-          <div>
-            <p className="text-sm text-muted-foreground">Progresso</p>
-            <p className="text-2xl font-semibold">
-              {completedItems.length > 0 
-                ? Math.round((completedItems.length / filteredItems.length) * 100)
-                : 0}%
-            </p>
-          </div>
-          <Button onClick={handleAddItem} className="bg-orange-500 hover:bg-orange-600">
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Tarefa
-          </Button>
-        </div>
-      )}
+      <ListViewSummary 
+        mode={mode}
+        totalPrice={totalPrice}
+        handleAddItem={handleAddItem}
+      />
 
       <div className="mb-6">
         <div className="relative mb-4">
@@ -155,7 +129,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
               {mode === 'shopping' ? (
                 <ShoppingBag className="mr-2 h-4 w-4" />
               ) : (
-                <Clock className="mr-2 h-4 w-4" />
+                <ShoppingBag className="mr-2 h-4 w-4" />
               )}
               Pendentes ({pendingItems.length})
             </TabsTrigger>
@@ -203,25 +177,23 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       ) : (
         <div className="space-y-2">
-          {itemsToDisplay.map(item => {
-            const isTaskItem = 'priority' in item;
-            
-            return mode === 'shopping' && !isTaskItem ? (
+          {itemsToDisplay.map(item => (
+            mode === 'shopping' && !isTaskItem(item) ? (
               <ShoppingListItem 
                 key={item.id} 
-                item={item as ShoppingItem} 
+                item={item}
                 listId={activeList.id}
                 onEdit={() => handleEditItem(item)}
               />
-            ) : (
+            ) : isTaskItem(item) && mode === 'tasks' ? (
               <TaskListItem 
                 key={item.id}
-                item={item as TaskItem}
+                item={item}
                 listId={activeList.id}
                 onEdit={() => handleEditItem(item)}
               />
-            );
-          })}
+            ) : null
+          ))}
         </div>
       )}
 

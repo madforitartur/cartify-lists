@@ -5,6 +5,8 @@ export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
 export type TaskCategory = 'general' | 'work' | 'personal' | 'health' | 'education' | 'home';
 
+export type ListType = 'shopping' | 'tasks';
+
 export interface BaseItem {
   id: string;
   name: string;
@@ -33,6 +35,7 @@ export interface ShoppingList {
   items: ShoppingItem[] | TaskItem[];
   createdAt: Date | string;
   updatedAt: Date | string;
+  listType: ListType;
 }
 
 export type AppMode = 'shopping' | 'tasks';

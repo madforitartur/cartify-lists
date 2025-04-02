@@ -1,6 +1,8 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory } from '@/types';
+import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory, ListType } from '@/types';
 import { toast } from "sonner";
+import { useAppMode } from '@/contexts/AppModeContext';
 
 interface ShoppingListContextType {
   lists: ShoppingList[];
@@ -15,6 +17,7 @@ interface ShoppingListContextType {
   toggleItemCompletion: (listId: string, itemId: string) => void;
   getActiveList: () => ShoppingList | undefined;
   calculateTotalPrice: (listId: string) => number;
+  getFilteredLists: () => ShoppingList[];
 }
 
 const ShoppingListContext = createContext<ShoppingListContextType | undefined>(undefined);
@@ -32,27 +35,48 @@ const STORAGE_KEY = 'cartify-shopping-lists';
 export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [activeListId, setActiveListId] = useState<string | null>(null);
+  const { mode } = useAppMode();
 
   useEffect(() => {
     const storedLists = localStorage.getItem(STORAGE_KEY);
     if (storedLists) {
       try {
         const parsedLists = JSON.parse(storedLists);
-        setLists(parsedLists);
         
-        if (parsedLists.length > 0 && !activeListId) {
-          setActiveListId(parsedLists[0].id);
+        // Ensure all lists have a listType property for backwards compatibility
+        const updatedLists = parsedLists.map((list: ShoppingList) => {
+          if (!list.listType) {
+            // Default to shopping type for existing lists
+            return { ...list, listType: 'shopping' as ListType };
+          }
+          return list;
+        });
+        
+        setLists(updatedLists);
+        
+        // Set active list based on current mode
+        const listsOfCurrentMode = updatedLists.filter(
+          (list: ShoppingList) => list.listType === mode
+        );
+        
+        if (listsOfCurrentMode.length > 0) {
+          setActiveListId(listsOfCurrentMode[0].id);
         }
       } catch (e) {
         console.error('Error parsing stored lists:', e);
         toast.error('Error loading your shopping lists');
       }
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
   }, [lists]);
+
+  // Filter lists based on current mode (shopping or tasks)
+  const getFilteredLists = () => {
+    return lists.filter(list => list.listType === mode);
+  };
 
   const createList = (name: string): ShoppingList => {
     const newList: ShoppingList = {
@@ -61,6 +85,7 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
       items: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      listType: mode, // Set the list type based on current mode
     };
 
     setLists(prev => [...prev, newList]);
@@ -86,7 +111,8 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setLists(prev => prev.filter(list => list.id !== id));
     
     if (activeListId === id) {
-      const remainingLists = lists.filter(list => list.id !== id);
+      // When deleting active list, set another list of the same type as active
+      const remainingLists = getFilteredLists().filter(list => list.id !== id);
       setActiveListId(remainingLists.length > 0 ? remainingLists[0].id : null);
     }
     
@@ -187,7 +213,17 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const list = lists.find(list => list.id === listId);
     if (!list) return 0;
     
-    return list.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    if (list.listType === 'shopping') {
+      // For shopping lists, calculate total price
+      return list.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    } else {
+      // For task lists, calculate completion percentage
+      const totalItems = list.items.length;
+      if (totalItems === 0) return 0;
+      
+      const completedItems = list.items.filter(item => item.completed).length;
+      return (completedItems / totalItems) * 100;
+    }
   };
 
   return (
@@ -204,7 +240,8 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
         deleteItem, 
         toggleItemCompletion,
         getActiveList,
-        calculateTotalPrice
+        calculateTotalPrice,
+        getFilteredLists
       }}
     >
       {children}
