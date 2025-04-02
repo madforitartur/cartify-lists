@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, CheckSquare } from 'lucide-react';
 import { AppMode } from '@/types';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -17,7 +17,7 @@ const ListViewSummary: React.FC<ListViewSummaryProps> = ({
   handleAddItem
 }) => {
   return (
-    <div className="bg-card border rounded-lg p-4 flex items-center justify-between mb-6">
+    <div className={`bg-card border rounded-lg p-4 flex items-center justify-between mb-6 ${mode === 'tasks' ? 'border-orange-200' : ''}`}>
       {mode === 'shopping' ? (
         <>
           <div>
@@ -33,13 +33,13 @@ const ListViewSummary: React.FC<ListViewSummaryProps> = ({
         <>
           <div>
             <p className="text-sm text-muted-foreground">Progresso</p>
-            <p className="text-2xl font-semibold">
+            <p className="text-2xl font-semibold text-orange-500">
               {totalPrice > 0 ? Math.round(totalPrice) : 0}%
             </p>
           </div>
           <Button onClick={handleAddItem} className="bg-orange-500 hover:bg-orange-600">
             <Plus className="mr-2 h-4 w-4" />
-            Adicionar Tarefa
+            <span>Adicionar Tarefa</span>
           </Button>
         </>
       )}

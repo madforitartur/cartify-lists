@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
-  Plus, ArrowLeft, Share2, Search, ShoppingBag, LayoutList, 
+  Plus, Search, ShoppingBag, LayoutList, 
   ShoppingBasket, Check, CheckSquare
 } from 'lucide-react';
 import { useShoppingList } from '@/contexts/ShoppingListContext';
@@ -11,8 +11,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import ShoppingListItem from './ShoppingListItem';
 import TaskListItem from './TaskListItem';
 import AddEditItemDialog from './AddEditItemDialog';
-import { formatCurrency } from '@/utils/formatters';
-import { ShoppingItem, TaskItem, AppMode } from '@/types';
+import AddEditTaskDialog from './AddEditTaskDialog';
+import { ShoppingItem, TaskItem } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppMode } from '@/contexts/AppModeContext';
 import ListViewHeader from './ListViewHeader';
@@ -22,10 +22,21 @@ interface ShoppingListViewProps {
   onBackToLists: () => void;
 }
 
+// Type guard to check if an item is a TaskItem
+const isTaskItem = (item: ShoppingItem | TaskItem): item is TaskItem => {
+  return 'priority' in item;
+};
+
+// Type guard to check if an item is a ShoppingItem
+const isShoppingItem = (item: ShoppingItem | TaskItem): item is ShoppingItem => {
+  return 'category' in item && !('priority' in item);
+};
+
 const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) => {
   const { activeListId, getActiveList, calculateTotalPrice, setActiveListId } = useShoppingList();
   const [searchTerm, setSearchTerm] = useState('');
   const [addEditItemDialogOpen, setAddEditItemDialogOpen] = useState(false);
+  const [addEditTaskDialogOpen, setAddEditTaskDialogOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<ShoppingItem | TaskItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('all');
   const { mode } = useAppMode();
@@ -38,9 +49,16 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   if (!activeList) {
     return (
       <div className="text-center py-12">
-        <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+        {mode === 'shopping' ? (
+          <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+        ) : (
+          <CheckSquare className="mx-auto h-12 w-12 text-orange-500 mb-3" />
+        )}
         <h3 className="text-xl font-medium">Nenhuma lista selecionada</h3>
-        <Button onClick={onBackToLists} className="mt-4">
+        <Button 
+          onClick={onBackToLists} 
+          className={mode === 'tasks' ? 'mt-4 bg-orange-500 hover:bg-orange-600' : 'mt-4'}
+        >
           Voltar para Listas
         </Button>
       </div>
@@ -54,12 +72,20 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
 
   const handleAddItem = () => {
     setItemToEdit(undefined);
-    setAddEditItemDialogOpen(true);
+    if (mode === 'shopping') {
+      setAddEditItemDialogOpen(true);
+    } else {
+      setAddEditTaskDialogOpen(true);
+    }
   };
 
   const handleEditItem = (item: ShoppingItem | TaskItem) => {
     setItemToEdit(item);
-    setAddEditItemDialogOpen(true);
+    if (isShoppingItem(item) && mode === 'shopping') {
+      setAddEditItemDialogOpen(true);
+    } else if (isTaskItem(item) && mode === 'tasks') {
+      setAddEditTaskDialogOpen(true);
+    }
   };
 
   const filteredItems = activeList.items.filter(item => 
@@ -81,11 +107,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   };
 
   const itemsToDisplay = getItemsToDisplay();
-  
-  // Check if the current item is a TaskItem
-  const isTaskItem = (item: ShoppingItem | TaskItem): item is TaskItem => {
-    return 'priority' in item;
-  };
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
@@ -129,7 +150,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
               {mode === 'shopping' ? (
                 <ShoppingBag className="mr-2 h-4 w-4" />
               ) : (
-                <ShoppingBag className="mr-2 h-4 w-4" />
+                <CheckSquare className="mr-2 h-4 w-4 text-orange-500" />
               )}
               Pendentes ({pendingItems.length})
             </TabsTrigger>
@@ -178,7 +199,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       ) : (
         <div className="space-y-2">
           {itemsToDisplay.map(item => (
-            mode === 'shopping' && !isTaskItem(item) ? (
+            mode === 'shopping' && isShoppingItem(item) ? (
               <ShoppingListItem 
                 key={item.id} 
                 item={item}
@@ -197,12 +218,21 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       )}
 
+      {/* Diálogo para itens de compras */}
       <AddEditItemDialog
         open={addEditItemDialogOpen}
         onOpenChange={setAddEditItemDialogOpen}
         listId={activeListId}
         itemToEdit={itemToEdit}
         mode={mode}
+      />
+      
+      {/* Diálogo para tarefas */}
+      <AddEditTaskDialog
+        open={addEditTaskDialogOpen}
+        onOpenChange={setAddEditTaskDialogOpen}
+        listId={activeListId}
+        itemToEdit={itemToEdit}
       />
     </div>
   );
