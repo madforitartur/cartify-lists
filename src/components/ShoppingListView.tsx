@@ -198,23 +198,29 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       ) : (
         <div className="space-y-2">
-          {itemsToDisplay.map(item => (
-            mode === 'shopping' && isShoppingItem(item) ? (
-              <ShoppingListItem 
-                key={item.id} 
-                item={item}
-                listId={activeList.id}
-                onEdit={() => handleEditItem(item)}
-              />
-            ) : isTaskItem(item) && mode === 'tasks' ? (
-              <TaskListItem 
-                key={item.id}
-                item={item}
-                listId={activeList.id}
-                onEdit={() => handleEditItem(item)}
-              />
-            ) : null
-          ))}
+          {itemsToDisplay.map(item => {
+            // Use type guards to safely render the correct component
+            if (mode === 'shopping' && isShoppingItem(item)) {
+              return (
+                <ShoppingListItem 
+                  key={item.id} 
+                  item={item}
+                  listId={activeList.id}
+                  onEdit={() => handleEditItem(item)}
+                />
+              );
+            } else if (mode === 'tasks' && isTaskItem(item)) {
+              return (
+                <TaskListItem 
+                  key={item.id}
+                  item={item}
+                  listId={activeList.id}
+                  onEdit={() => handleEditItem(item)}
+                />
+              );
+            }
+            return null;
+          })}
         </div>
       )}
 
@@ -223,7 +229,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         open={addEditItemDialogOpen}
         onOpenChange={setAddEditItemDialogOpen}
         listId={activeListId}
-        itemToEdit={itemToEdit}
+        itemToEdit={isShoppingItem(itemToEdit as any) ? itemToEdit as ShoppingItem : undefined}
         mode={mode}
       />
       
@@ -232,7 +238,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         open={addEditTaskDialogOpen}
         onOpenChange={setAddEditTaskDialogOpen}
         listId={activeListId}
-        itemToEdit={itemToEdit}
+        itemToEdit={isTaskItem(itemToEdit as any) ? itemToEdit as TaskItem : undefined}
       />
     </div>
   );

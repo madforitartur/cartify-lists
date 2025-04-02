@@ -29,6 +29,9 @@ export interface TaskItem extends BaseItem {
   dueDate?: Date | string;
 }
 
+// Define generic list item that can be either ShoppingItem or TaskItem
+export type ListItem = ShoppingItem | TaskItem;
+
 export interface ShoppingList {
   id: string;
   name: string;

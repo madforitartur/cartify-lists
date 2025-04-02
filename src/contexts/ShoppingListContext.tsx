@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory, ListType } from '@/types';
+import { ShoppingList, ShoppingItem, TaskItem, Category, BaseItem, TaskCategory, ListType, ListItem } from '@/types';
 import { toast } from "sonner";
 import { useAppMode } from '@/contexts/AppModeContext';
 
@@ -119,6 +119,11 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     toast.success(`Lista "${listToDelete?.name}" removida!`);
   };
 
+  // Add typeguard function
+  const isTaskItem = (item: any): item is TaskItem => {
+    return item && 'priority' in item;
+  }
+
   const addItem = (listId: string, item: Omit<ShoppingItem | TaskItem, 'id'>) => {
     const newItem = {
       ...item,
@@ -126,38 +131,57 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
 
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: [...list.items, newItem as ShoppingItem | TaskItem],
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        // This ensures type safety by checking the list type
+        if (list.listType === 'shopping') {
+          // For shopping lists, we know the items are ShoppingItem[]
+          return {
+            ...list,
+            items: [...(list.items as ShoppingItem[]), newItem as ShoppingItem],
+            updatedAt: new Date().toISOString()
+          };
+        } else {
+          // For task lists, we know the items are TaskItem[]
+          return {
+            ...list,
+            items: [...(list.items as TaskItem[]), newItem as TaskItem],
+            updatedAt: new Date().toISOString()
+          };
+        }
+      })
     );
     toast.success(`Item adicionado à lista!`);
   };
 
   const updateItem = (listId: string, itemId: string, updatedFields: Partial<ShoppingItem | TaskItem>) => {
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: list.items.map(item => 
-                item.id === itemId 
-                  ? { 
-                      ...item, 
-                      ...updatedFields,
-                      updatedAt: new Date().toISOString() 
-                    } 
-                  : item
-              ) as (ShoppingItem | TaskItem)[],
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        if (list.listType === 'shopping') {
+          return {
+            ...list,
+            items: (list.items as ShoppingItem[]).map(item => 
+              item.id === itemId 
+                ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() } as ShoppingItem
+                : item
+            ),
+            updatedAt: new Date().toISOString()
+          };
+        } else {
+          return {
+            ...list,
+            items: (list.items as TaskItem[]).map(item => 
+              item.id === itemId 
+                ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() } as TaskItem
+                : item
+            ),
+            updatedAt: new Date().toISOString()
+          };
+        }
+      })
     );
     toast.success(`Item atualizado com sucesso!`);
   };
@@ -169,15 +193,15 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const itemToDelete = lists[listIndex].items.find(item => item.id === itemId);
     
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: list.items.filter(item => item.id !== itemId),
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        return {
+          ...list,
+          items: list.items.filter(item => item.id !== itemId),
+          updatedAt: new Date().toISOString()
+        };
+      })
     );
     
     toast.success(`Item "${itemToDelete?.name}" removido!`);
@@ -185,23 +209,19 @@ export const ShoppingListProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const toggleItemCompletion = (listId: string, itemId: string) => {
     setLists(prev => 
-      prev.map(list => 
-        list.id === listId 
-          ? { 
-              ...list, 
-              items: list.items.map(item => 
-                item.id === itemId 
-                  ? { 
-                      ...item, 
-                      completed: !item.completed,
-                      updatedAt: new Date().toISOString() 
-                    } 
-                  : item
-              ),
-              updatedAt: new Date().toISOString() 
-            } 
-          : list
-      )
+      prev.map(list => {
+        if (list.id !== listId) return list;
+        
+        return {
+          ...list,
+          items: list.items.map(item => 
+            item.id === itemId 
+              ? { ...item, completed: !item.completed, updatedAt: new Date().toISOString() }
+              : item
+          ),
+          updatedAt: new Date().toISOString()
+        };
+      })
     );
   };
 
