@@ -81,6 +81,22 @@ export default {
 					meat: '#F43F5E',
 					beverages: '#10B981',
 					default: '#64748B'
+				},
+				// Theme colors
+				purple: {
+					'500': '#8B5CF6'
+				},
+				orange: {
+					'500': '#F97316'
+				},
+				blue: {
+					'500': '#0EA5E9'
+				},
+				green: {
+					'500': '#10B981'
+				},
+				red: {
+					'500': '#F43F5E'
 				}
 			},
 			borderRadius: {

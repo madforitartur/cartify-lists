@@ -1,21 +1,20 @@
 
 import { useEffect } from 'react';
 import { useIsMobile } from './use-mobile';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 
 export const useActiveListNavigation = (
-  showLists: boolean, 
+  showLists: boolean,
   setShowLists: (show: boolean) => void
 ) => {
-  const isMobile = useIsMobile();
   const { activeListId } = useShoppingList();
-
-  // On mobile, when an active list is selected, switch to the list view
+  const isMobile = useIsMobile();
+  
+  // On mobile, when activeListId changes and it's not null
+  // we want to navigate to the list view (i.e., hide the list selector)
   useEffect(() => {
-    if (isMobile && activeListId && showLists) {
+    if (isMobile && activeListId) {
       setShowLists(false);
     }
-  }, [activeListId, isMobile, showLists, setShowLists]);
-
-  return null;
+  }, [activeListId, isMobile, setShowLists]);
 };

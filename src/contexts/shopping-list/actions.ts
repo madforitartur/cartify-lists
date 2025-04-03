@@ -1,7 +1,6 @@
 
-import { ShoppingList, ShoppingItem, TaskItem } from '@/types';
+import { ShoppingList, ShoppingItem, TaskItem, ListType } from '@/types';
 import { toast } from "sonner";
-import { isTaskItem } from './utils';
 
 export const createListAction = (
   name: string, 
@@ -74,13 +73,11 @@ export const addItemAction = (
     prev.map(list => {
       if (list.id !== listId) return list;
       
-      // Make a type-safe update based on the list type
-      const updatedList = {
+      return {
         ...list,
-        items: [...list.items, newItem] as typeof list.items,
+        items: [...list.items, newItem],
         updatedAt: new Date().toISOString()
       };
-      return updatedList;
     })
   );
   toast.success(`Item adicionado à lista!`);
@@ -102,7 +99,7 @@ export const updateItemAction = (
           item.id === itemId 
             ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() }
             : item
-        ) as typeof list.items,
+        ),
         updatedAt: new Date().toISOString()
       };
     })
@@ -151,7 +148,7 @@ export const toggleItemCompletionAction = (
           item.id === itemId 
             ? { ...item, completed: !item.completed, updatedAt: new Date().toISOString() }
             : item
-        ) as typeof list.items,
+        ),
         updatedAt: new Date().toISOString()
       };
     })

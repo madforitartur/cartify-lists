@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useAppMode } from '@/contexts/AppModeContext';
-import { useShoppingList } from '@/contexts/ShoppingListContext';
+import { useShoppingList } from '@/contexts/shopping-list';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { ShoppingCart, CheckSquare } from 'lucide-react';
 
