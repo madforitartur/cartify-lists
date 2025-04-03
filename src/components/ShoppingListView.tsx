@@ -23,13 +23,13 @@ interface ShoppingListViewProps {
 }
 
 // Type guard to check if an item is a TaskItem
-const isTaskItem = (item: ShoppingItem | TaskItem): item is TaskItem => {
-  return 'priority' in item;
+const isTaskItem = (item: ShoppingItem | TaskItem | undefined | null): item is TaskItem => {
+  return item !== undefined && item !== null && 'priority' in item;
 };
 
 // Type guard to check if an item is a ShoppingItem
-const isShoppingItem = (item: ShoppingItem | TaskItem): item is ShoppingItem => {
-  return 'category' in item && !('priority' in item);
+const isShoppingItem = (item: ShoppingItem | TaskItem | undefined | null): item is ShoppingItem => {
+  return item !== undefined && item !== null && 'category' in item && !('priority' in item);
 };
 
 const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) => {

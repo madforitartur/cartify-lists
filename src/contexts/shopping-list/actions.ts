@@ -69,13 +69,39 @@ export const addItemAction = (
     id: crypto.randomUUID(),
   };
 
+  // Type safety check to ensure we're adding the right type of item to the right type of list
   setLists(prev => 
     prev.map(list => {
       if (list.id !== listId) return list;
       
+      // Create a proper typed version of the items array
+      let typedItems;
+      if (list.listType === 'shopping') {
+        // For shopping lists, ensure the item has a category property
+        if ('priority' in newItem) {
+          // This is a task item being added to a shopping list (unusual case)
+          // Convert to shopping item or handle as needed
+          const { priority, description, dueDate, ...rest } = newItem as TaskItem;
+          typedItems = [...list.items, { ...rest, category: 'default' }] as ShoppingItem[];
+        } else {
+          // Normal case: Shopping item to shopping list
+          typedItems = [...list.items, newItem] as ShoppingItem[];
+        }
+      } else {
+        // For task lists, ensure the item has a priority property
+        if (!('priority' in newItem)) {
+          // This is a shopping item being added to a task list (unusual case)
+          // Convert to task item or handle as needed
+          typedItems = [...list.items, { ...newItem, priority: 'medium', category: 'general' }] as TaskItem[];
+        } else {
+          // Normal case: Task item to task list
+          typedItems = [...list.items, newItem] as TaskItem[];
+        }
+      }
+      
       return {
         ...list,
-        items: [...list.items, newItem],
+        items: typedItems,
         updatedAt: new Date().toISOString()
       };
     })
@@ -93,13 +119,16 @@ export const updateItemAction = (
     prev.map(list => {
       if (list.id !== listId) return list;
       
+      // Type safety for updating items
+      const updatedItems = list.items.map(item => 
+        item.id === itemId 
+          ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() }
+          : item
+      );
+      
       return {
         ...list,
-        items: list.items.map(item => 
-          item.id === itemId 
-            ? { ...item, ...updatedFields, updatedAt: new Date().toISOString() }
-            : item
-        ),
+        items: list.listType === 'shopping' ? updatedItems as ShoppingItem[] : updatedItems as TaskItem[],
         updatedAt: new Date().toISOString()
       };
     })
@@ -122,9 +151,11 @@ export const deleteItemAction = (
     prev.map(list => {
       if (list.id !== listId) return list;
       
+      const filteredItems = list.items.filter(item => item.id !== itemId);
+      
       return {
         ...list,
-        items: list.items.filter(item => item.id !== itemId),
+        items: list.listType === 'shopping' ? filteredItems as ShoppingItem[] : filteredItems as TaskItem[],
         updatedAt: new Date().toISOString()
       };
     })
@@ -142,13 +173,15 @@ export const toggleItemCompletionAction = (
     prev.map(list => {
       if (list.id !== listId) return list;
       
+      const toggledItems = list.items.map(item => 
+        item.id === itemId 
+          ? { ...item, completed: !item.completed, updatedAt: new Date().toISOString() }
+          : item
+      );
+      
       return {
         ...list,
-        items: list.items.map(item => 
-          item.id === itemId 
-            ? { ...item, completed: !item.completed, updatedAt: new Date().toISOString() }
-            : item
-        ),
+        items: list.listType === 'shopping' ? toggledItems as ShoppingItem[] : toggledItems as TaskItem[],
         updatedAt: new Date().toISOString()
       };
     })
