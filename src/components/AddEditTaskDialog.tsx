@@ -137,7 +137,7 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
       name: formState.name.trim(),
       description: formState.description,
       priority: formState.priority,
-      category: formState.category,
+      category: formState.category as TaskCategory,
       dueDate: formState.dueDate,
       quantity: 1,
       unit: 'un',
@@ -223,7 +223,7 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
               </Label>
               <Select
                 value={formState.category}
-                onValueChange={value => handleSelectChange('category', value)}
+                onValueChange={value => handleSelectChange('category', value as TaskCategory)}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Selecione uma categoria" />
@@ -257,12 +257,13 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                     <Calendar
                       mode="single"
                       selected={formState.dueDate}
                       onSelect={handleDateChange}
                       initialFocus
+                      className="pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>

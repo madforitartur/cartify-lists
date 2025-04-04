@@ -41,6 +41,7 @@ const getCategoryLabel = (category: TaskCategory) => {
     case 'health': return 'Saúde';
     case 'education': return 'Educação';
     case 'home': return 'Casa';
+    case 'general': return 'Geral';
     default: return 'Geral';
   }
 };
