@@ -223,7 +223,7 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
               </Label>
               <Select
                 value={formState.category}
-                onValueChange={value => handleSelectChange('category', value as TaskCategory)}
+                onValueChange={value => handleSelectChange('category', value)}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Selecione uma categoria" />
