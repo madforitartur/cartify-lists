@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { ShoppingList } from '@/types';
 import { useShoppingList } from '@/contexts/shopping-list';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAppMode } from '@/contexts/AppModeContext';
 
 interface AddEditListDialogProps {
   open: boolean;
@@ -29,7 +30,8 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
   const { createList, updateList } = useShoppingList();
   const isEditMode = !!listToEdit;
   const isMobile = useIsMobile();
-
+  const { mode } = useAppMode();
+  
   React.useEffect(() => {
     if (open && listToEdit) {
       setListName(listToEdit.name);
@@ -53,6 +55,14 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
     onOpenChange(false);
   };
 
+  // Texto do título baseado no modo atual (compras ou tarefas)
+  const getDialogTitle = () => {
+    if (isEditMode) {
+      return 'Editar Lista';
+    }
+    return mode === 'shopping' ? 'Nova Lista de Compras' : 'Nova Lista de Tarefas';
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
@@ -61,7 +71,7 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
-              {isEditMode ? 'Editar Lista' : 'Nova Lista de Compras'}
+              {getDialogTitle()}
             </DialogTitle>
           </DialogHeader>
           
@@ -89,7 +99,11 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={!listName.trim()}>
+            <Button 
+              type="submit" 
+              disabled={!listName.trim()}
+              className={mode === 'tasks' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+            >
               {isEditMode ? 'Salvar' : 'Criar Lista'}
             </Button>
           </DialogFooter>
