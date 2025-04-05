@@ -97,6 +97,15 @@ export default {
 				},
 				red: {
 					'500': '#F43F5E'
+				},
+				pink: {
+					'500': '#EC4899'
+				},
+				teal: {
+					'500': '#14B8A6'
+				},
+				indigo: {
+					'500': '#6366F1'
 				}
 			},
 			borderRadius: {

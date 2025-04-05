@@ -33,8 +33,14 @@ const Settings = () => {
     blue: 'bg-blue-500',
     green: 'bg-green-500',
     red: 'bg-red-500',
-    orange: 'bg-orange-500'
+    orange: 'bg-orange-500',
+    pink: 'bg-pink-500',
+    teal: 'bg-teal-500',
+    indigo: 'bg-indigo-500'
   };
+  
+  // Define a consistent color order for both shopping and tasks modes
+  const colorOrder = ['purple', 'blue', 'green', 'red', 'orange', 'pink', 'teal', 'indigo'];
   
   return (
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
@@ -134,8 +140,8 @@ const Settings = () => {
             <div className="grid gap-6">
               <div className="space-y-2">
                 <Label>Cor do Modo Compras</Label>
-                <div className="grid grid-cols-5 gap-2">
-                  {['purple', 'blue', 'green', 'red', 'orange'].map((color) => (
+                <div className="grid grid-cols-4 gap-2">
+                  {colorOrder.map((color) => (
                     <Button 
                       key={color}
                       variant="outline"
@@ -149,8 +155,8 @@ const Settings = () => {
               </div>
               <div className="space-y-2">
                 <Label>Cor do Modo Tarefas</Label>
-                <div className="grid grid-cols-5 gap-2">
-                  {['orange', 'purple', 'blue', 'green', 'red'].map((color) => (
+                <div className="grid grid-cols-4 gap-2">
+                  {colorOrder.map((color) => (
                     <Button 
                       key={color}
                       variant="outline"

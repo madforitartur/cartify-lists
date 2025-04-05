@@ -4,10 +4,12 @@ import { useAppMode } from '@/contexts/AppModeContext';
 import { useShoppingList } from '@/contexts/shopping-list';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { ShoppingCart, CheckSquare } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const AppModeToggle: React.FC = () => {
   const { mode, setMode } = useAppMode();
   const { lists, setActiveListId } = useShoppingList();
+  const { getAccentColorClass } = useTheme();
   
   // When mode changes, update the active list
   useEffect(() => {
@@ -17,7 +19,7 @@ const AppModeToggle: React.FC = () => {
     } else {
       setActiveListId(null);
     }
-  }, [mode, lists]);
+  }, [mode, lists, setActiveListId]);
 
   const handleModeChange = (value: string) => {
     if (value) {
@@ -36,7 +38,7 @@ const AppModeToggle: React.FC = () => {
         <ToggleGroupItem 
           value="shopping" 
           aria-label="Modo Compras"
-          className="flex-1 rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          className={`flex-1 rounded-full data-[state=on]:${getAccentColorClass('shopping', 'bg')} data-[state=on]:text-white`}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Compras
@@ -44,7 +46,7 @@ const AppModeToggle: React.FC = () => {
         <ToggleGroupItem 
           value="tasks" 
           aria-label="Modo Tarefas"
-          className="flex-1 rounded-full data-[state=on]:bg-orange-500 data-[state=on]:text-white"
+          className={`flex-1 rounded-full data-[state=on]:${getAccentColorClass('tasks', 'bg')} data-[state=on]:text-white`}
         >
           <CheckSquare className="mr-2 h-4 w-4" />
           Tarefas

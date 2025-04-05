@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 type ThemeMode = 'light' | 'dark';
 type CurrencyType = 'BRL' | 'USD' | 'EUR';
-type AccentColor = 'purple' | 'orange' | 'blue' | 'green' | 'red';
+type AccentColor = 'purple' | 'blue' | 'green' | 'red' | 'orange' | 'pink' | 'teal' | 'indigo';
 
 interface ThemeSettings {
   mode: ThemeMode;
@@ -67,6 +67,21 @@ const accentColorMap = {
     bg: 'bg-red-500',
     text: 'text-red-500',
     border: 'border-red-500',
+  },
+  pink: {
+    bg: 'bg-pink-500',
+    text: 'text-pink-500',
+    border: 'border-pink-500',
+  },
+  teal: {
+    bg: 'bg-teal-500',
+    text: 'text-teal-500',
+    border: 'border-teal-500',
+  },
+  indigo: {
+    bg: 'bg-indigo-500',
+    text: 'text-indigo-500',
+    border: 'border-indigo-500',
   },
 };
 
