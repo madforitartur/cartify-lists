@@ -32,7 +32,7 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
   const isEditMode = !!listToEdit;
   const isMobile = useIsMobile();
   const { mode } = useAppMode();
-  const { getAccentColorClass } = useTheme();
+  const { settings } = useTheme();
   
   React.useEffect(() => {
     if (open && listToEdit) {
@@ -63,6 +63,12 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
       return 'Editar Lista';
     }
     return mode === 'shopping' ? 'Nova Lista de Compras' : 'Nova Lista de Tarefas';
+  };
+
+  // Get the button color class based on current mode
+  const getButtonColorClass = () => {
+    const color = mode === 'shopping' ? settings.shoppingAccentColor : settings.tasksAccentColor;
+    return `bg-${color}-500 hover:bg-${color}-600`;
   };
 
   return (
@@ -104,7 +110,7 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
             <Button 
               type="submit" 
               disabled={!listName.trim()}
-              className={getAccentColorClass(mode, 'bg')}
+              className={getButtonColorClass()}
             >
               {isEditMode ? 'Salvar' : 'Criar Lista'}
             </Button>
