@@ -27,6 +27,15 @@ const Settings = () => {
   const { settings, setMode, setCurrency, setAccentColor } = useTheme();
   const { mode } = useAppMode();
   
+  // Color mapping for visual display of color options
+  const colorClasses = {
+    purple: 'bg-purple-500',
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    red: 'bg-red-500',
+    orange: 'bg-orange-500'
+  };
+  
   return (
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
       <div className="mb-6">
@@ -129,10 +138,11 @@ const Settings = () => {
                   {['purple', 'blue', 'green', 'red', 'orange'].map((color) => (
                     <Button 
                       key={color}
-                      variant={settings.shoppingAccentColor === color ? 'default' : 'outline'}
-                      className={`h-10 w-full ${color === settings.shoppingAccentColor ? 'ring-2 ring-offset-2' : ''}`}
+                      variant="outline"
+                      className={`h-10 w-full ${
+                        color === settings.shoppingAccentColor ? 'ring-2 ring-offset-2' : ''
+                      } ${colorClasses[color as keyof typeof colorClasses]}`}
                       onClick={() => setAccentColor('shopping', color as any)}
-                      style={{ backgroundColor: `var(--${color}-500)` }}
                     />
                   ))}
                 </div>
@@ -143,10 +153,11 @@ const Settings = () => {
                   {['orange', 'purple', 'blue', 'green', 'red'].map((color) => (
                     <Button 
                       key={color}
-                      variant={settings.tasksAccentColor === color ? 'default' : 'outline'}
-                      className={`h-10 w-full ${color === settings.tasksAccentColor ? 'ring-2 ring-offset-2' : ''}`}
+                      variant="outline"
+                      className={`h-10 w-full ${
+                        color === settings.tasksAccentColor ? 'ring-2 ring-offset-2' : ''
+                      } ${colorClasses[color as keyof typeof colorClasses]}`}
                       onClick={() => setAccentColor('tasks', color as any)}
-                      style={{ backgroundColor: `var(--${color}-500)` }}
                     />
                   ))}
                 </div>
