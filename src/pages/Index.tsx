@@ -5,7 +5,7 @@ import { ShoppingListProvider } from '@/contexts/shopping-list';
 import ListSelector from '@/components/ListSelector';
 import ShoppingListView from '@/components/ShoppingListView';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Github, Settings as SettingsIcon } from 'lucide-react';
+import { ShoppingCart, Github, Settings as SettingsIcon, Home } from 'lucide-react';
 import { useActiveListNavigation } from '@/hooks/use-active-list-navigation';
 import AppModeToggle from '@/components/AppModeToggle';
 import { useAppMode } from '@/contexts/AppModeContext';
@@ -41,6 +41,12 @@ const AppContent: React.FC<{
             <h1 className="text-xl font-bold">Cartify</h1>
           </div>
           <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/" className="flex items-center">
+                <Home className="mr-2 h-4 w-4" />
+                Início
+              </Link>
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/settings" className="flex items-center">
                 <SettingsIcon className="mr-2 h-4 w-4" />

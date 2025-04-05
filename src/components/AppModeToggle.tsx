@@ -9,7 +9,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 const AppModeToggle: React.FC = () => {
   const { mode, setMode } = useAppMode();
   const { lists, setActiveListId } = useShoppingList();
-  const { getAccentColorClass, settings } = useTheme();
+  const { settings } = useTheme();
   
   // When mode changes, update the active list
   useEffect(() => {
@@ -27,7 +27,7 @@ const AppModeToggle: React.FC = () => {
     }
   };
 
-  // Get the actual color classes directly from the theme settings
+  // Get dynamic color classes based on the user's theme settings
   const getButtonColorClass = (buttonMode: 'shopping' | 'tasks') => {
     const color = buttonMode === 'shopping' 
       ? settings.shoppingAccentColor 
