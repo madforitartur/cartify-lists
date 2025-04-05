@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppMode } from '@/contexts/AppModeContext';
 import ListViewHeader from './ListViewHeader';
 import ListViewSummary from './ListViewSummary';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ShoppingListViewProps {
   onBackToLists: () => void;
@@ -40,6 +41,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
   const [itemToEdit, setItemToEdit] = useState<ShoppingItem | TaskItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<string>('all');
   const { mode } = useAppMode();
+  const { getAccentColorClass } = useTheme();
   
   const isMobile = useIsMobile();
   const activeList = getActiveList();
@@ -88,9 +90,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
     }
   };
 
-  const filteredItems = activeList.items.filter(item => 
+  const filteredItems = activeList?.items.filter(item => 
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) || [];
 
   const pendingItems = filteredItems.filter(item => !item.completed);
   const completedItems = filteredItems.filter(item => item.completed);
@@ -135,28 +137,28 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className={`grid grid-cols-3 mb-4 ${mode === 'tasks' ? 'bg-orange-100' : ''}`}>
+          <TabsList className={`grid grid-cols-3 mb-4 ${mode === 'tasks' ? `bg-opacity-10 ${getAccentColorClass(mode, 'bg')}` : ''}`}>
             <TabsTrigger 
               value="all" 
-              className={`flex items-center ${mode === 'tasks' ? 'data-[state=active]:bg-orange-50 data-[state=active]:text-orange-900' : ''}`}
+              className={`flex items-center ${mode === 'tasks' ? `data-[state=active]:bg-opacity-10 data-[state=active]:${getAccentColorClass(mode, 'bg')} data-[state=active]:${getAccentColorClass(mode, 'text')}` : ''}`}
             >
               <LayoutList className="mr-2 h-4 w-4" />
               Todos ({filteredItems.length})
             </TabsTrigger>
             <TabsTrigger 
               value="pending" 
-              className={`flex items-center ${mode === 'tasks' ? 'data-[state=active]:bg-orange-50 data-[state=active]:text-orange-900' : ''}`}
+              className={`flex items-center ${mode === 'tasks' ? `data-[state=active]:bg-opacity-10 data-[state=active]:${getAccentColorClass(mode, 'bg')} data-[state=active]:${getAccentColorClass(mode, 'text')}` : ''}`}
             >
               {mode === 'shopping' ? (
                 <ShoppingBag className="mr-2 h-4 w-4" />
               ) : (
-                <CheckSquare className="mr-2 h-4 w-4 text-orange-500" />
+                <CheckSquare className={`mr-2 h-4 w-4 ${getAccentColorClass(mode, 'text')}`} />
               )}
               Pendentes ({pendingItems.length})
             </TabsTrigger>
             <TabsTrigger 
               value="completed" 
-              className={`flex items-center ${mode === 'tasks' ? 'data-[state=active]:bg-orange-50 data-[state=active]:text-orange-900' : ''}`}
+              className={`flex items-center ${mode === 'tasks' ? `data-[state=active]:bg-opacity-10 data-[state=active]:${getAccentColorClass(mode, 'bg')} data-[state=active]:${getAccentColorClass(mode, 'text')}` : ''}`}
             >
               <Check className="mr-2 h-4 w-4" />
               Concluídos ({completedItems.length})
@@ -168,9 +170,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       {itemsToDisplay.length === 0 ? (
         <div className="text-center py-12 bg-muted/20 rounded-lg border border-dashed">
           {mode === 'shopping' ? (
-            <ShoppingBasket className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+            <ShoppingBasket className={`mx-auto h-12 w-12 ${getAccentColorClass('shopping', 'text')} mb-3`} />
           ) : (
-            <CheckSquare className="mx-auto h-12 w-12 text-orange-500 mb-3" />
+            <CheckSquare className={`mx-auto h-12 w-12 ${getAccentColorClass('tasks', 'text')} mb-3`} />
           )}
           
           {searchTerm ? (
@@ -188,7 +190,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
               </p>
               <Button 
                 onClick={handleAddItem}
-                className={mode === 'tasks' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+                className={getAccentColorClass(mode, 'bg')}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Adicionar {mode === 'shopping' ? 'Item' : 'Tarefa'}

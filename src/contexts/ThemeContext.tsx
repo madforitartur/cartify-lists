@@ -44,42 +44,42 @@ export const useTheme = () => {
 // Map accent colors to Tailwind classes
 const accentColorMap = {
   purple: {
-    bg: 'bg-purple-500',
+    bg: 'bg-purple-500 hover:bg-purple-600',
     text: 'text-purple-500',
     border: 'border-purple-500',
   },
   orange: {
-    bg: 'bg-orange-500',
+    bg: 'bg-orange-500 hover:bg-orange-600',
     text: 'text-orange-500',
     border: 'border-orange-500',
   },
   blue: {
-    bg: 'bg-blue-500',
+    bg: 'bg-blue-500 hover:bg-blue-600',
     text: 'text-blue-500',
     border: 'border-blue-500',
   },
   green: {
-    bg: 'bg-green-500',
+    bg: 'bg-green-500 hover:bg-green-600',
     text: 'text-green-500',
     border: 'border-green-500',
   },
   red: {
-    bg: 'bg-red-500',
+    bg: 'bg-red-500 hover:bg-red-600',
     text: 'text-red-500',
     border: 'border-red-500',
   },
   pink: {
-    bg: 'bg-pink-500',
+    bg: 'bg-pink-500 hover:bg-pink-600',
     text: 'text-pink-500',
     border: 'border-pink-500',
   },
   teal: {
-    bg: 'bg-teal-500',
+    bg: 'bg-teal-500 hover:bg-teal-600',
     text: 'text-teal-500',
     border: 'border-teal-500',
   },
   indigo: {
-    bg: 'bg-indigo-500',
+    bg: 'bg-indigo-500 hover:bg-indigo-600',
     text: 'text-indigo-500',
     border: 'border-indigo-500',
   },

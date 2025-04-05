@@ -7,10 +7,12 @@ import ListSelectorCard from './ListSelectorCard';
 import AddEditListDialog from './AddEditListDialog';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { ShoppingList } from '@/types';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const ListSelector: React.FC = () => {
   const { lists, activeListId, setActiveListId, getFilteredLists } = useShoppingList();
   const { mode } = useAppMode();
+  const { getAccentColorClass } = useTheme();
   const [addEditDialogOpen, setAddEditDialogOpen] = React.useState(false);
   const [listToEdit, setListToEdit] = React.useState<string | null>(null);
 
@@ -50,15 +52,15 @@ const ListSelector: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold flex items-center">
           {mode === 'shopping' ? (
-            <ShoppingCart className="mr-2 text-primary" />
+            <ShoppingCart className={`mr-2 ${getAccentColorClass('shopping', 'text')}`} />
           ) : (
-            <CheckSquare className="mr-2 text-orange-500" />
+            <CheckSquare className={`mr-2 ${getAccentColorClass('tasks', 'text')}`} />
           )}
           Minhas Listas
         </h2>
         <Button 
           onClick={handleCreateNewList}
-          className={mode === 'tasks' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+          className={mode === 'tasks' ? getAccentColorClass('tasks', 'bg') : getAccentColorClass('shopping', 'bg')}
         >
           <Plus className="mr-2 h-4 w-4" />
           Nova Lista
@@ -68,9 +70,9 @@ const ListSelector: React.FC = () => {
       {lists.length === 0 ? (
         <div className="text-center py-8 bg-muted/20 rounded-lg border border-dashed">
           {mode === 'shopping' ? (
-            <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+            <ShoppingCart className={`mx-auto h-12 w-12 ${getAccentColorClass('shopping', 'text')} mb-3`} />
           ) : (
-            <CheckSquare className="mx-auto h-12 w-12 text-orange-500 mb-3" />
+            <CheckSquare className={`mx-auto h-12 w-12 ${getAccentColorClass('tasks', 'text')} mb-3`} />
           )}
           <h3 className="text-lg font-medium">Nenhuma lista criada</h3>
           <p className="text-muted-foreground mb-4">
@@ -78,7 +80,7 @@ const ListSelector: React.FC = () => {
           </p>
           <Button 
             onClick={handleCreateNewList}
-            className={mode === 'tasks' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+            className={mode === 'tasks' ? getAccentColorClass('tasks', 'bg') : getAccentColorClass('shopping', 'bg')}
           >
             <Plus className="mr-2 h-4 w-4" />
             Criar Lista

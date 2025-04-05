@@ -38,7 +38,7 @@ const AppModeToggle: React.FC = () => {
         <ToggleGroupItem 
           value="shopping" 
           aria-label="Modo Compras"
-          className={`flex-1 rounded-full data-[state=on]:${getAccentColorClass('shopping', 'bg')} data-[state=on]:text-white`}
+          className={`flex-1 rounded-full ${getAccentColorClass('shopping', 'bg')} data-[state=on]:text-white transition-colors data-[state=on]:shadow-sm`}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Compras
@@ -46,7 +46,7 @@ const AppModeToggle: React.FC = () => {
         <ToggleGroupItem 
           value="tasks" 
           aria-label="Modo Tarefas"
-          className={`flex-1 rounded-full data-[state=on]:${getAccentColorClass('tasks', 'bg')} data-[state=on]:text-white`}
+          className={`flex-1 rounded-full ${getAccentColorClass('tasks', 'bg')} data-[state=on]:text-white transition-colors data-[state=on]:shadow-sm`}
         >
           <CheckSquare className="mr-2 h-4 w-4" />
           Tarefas

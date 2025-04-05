@@ -14,6 +14,7 @@ import { ShoppingList } from '@/types';
 import { useShoppingList } from '@/contexts/shopping-list';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAppMode } from '@/contexts/AppModeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface AddEditListDialogProps {
   open: boolean;
@@ -31,6 +32,7 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
   const isEditMode = !!listToEdit;
   const isMobile = useIsMobile();
   const { mode } = useAppMode();
+  const { getAccentColorClass } = useTheme();
   
   React.useEffect(() => {
     if (open && listToEdit) {
@@ -102,7 +104,7 @@ const AddEditListDialog: React.FC<AddEditListDialogProps> = ({
             <Button 
               type="submit" 
               disabled={!listName.trim()}
-              className={mode === 'tasks' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+              className={getAccentColorClass(mode, 'bg')}
             >
               {isEditMode ? 'Salvar' : 'Criar Lista'}
             </Button>
