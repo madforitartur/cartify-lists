@@ -30,6 +30,12 @@ const AppContent: React.FC<{
   
   // This hook handles the navigation on mobile when an active list is selected
   useActiveListNavigation(showLists, setShowLists);
+  
+  // Add click handler to prevent event propagation issues
+  const handleContentClick = (e: React.MouseEvent) => {
+    // This helps prevent clicks from propagating up to parent elements
+    e.stopPropagation();
+  };
 
   const toggleTheme = () => {
     const newMode = settings.mode === 'dark' ? 'light' : 'dark';
@@ -85,7 +91,7 @@ const AppContent: React.FC<{
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto w-full flex-1 flex flex-col">
+      <main className="max-w-7xl mx-auto w-full flex-1 flex flex-col" onClick={handleContentClick}>
         {isMobile ? (
           // Mobile layout - Show either lists or active list
           showLists ? (

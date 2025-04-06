@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -110,8 +109,13 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
 
   const itemsToDisplay = getItemsToDisplay();
 
+  const handleItemClick = (e: React.MouseEvent, item: ShoppingItem | TaskItem) => {
+    e.stopPropagation();
+    handleEditItem(item);
+  };
+
   return (
-    <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
+    <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in" onClick={(e) => e.stopPropagation()}>
       <ListViewHeader 
         activeList={activeList}
         pendingItems={pendingItems.length}
@@ -201,7 +205,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
       ) : (
         <div className="space-y-2">
           {itemsToDisplay.map(item => {
-            // Use type guards to safely render the correct component
             if (mode === 'shopping' && isShoppingItem(item)) {
               return (
                 <ShoppingListItem 
@@ -226,7 +229,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       )}
 
-      {/* Diálogo para itens de compras */}
       <AddEditItemDialog
         open={addEditItemDialogOpen}
         onOpenChange={setAddEditItemDialogOpen}
@@ -235,7 +237,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         mode={mode}
       />
       
-      {/* Diálogo para tarefas */}
       <AddEditTaskDialog
         open={addEditTaskDialogOpen}
         onOpenChange={setAddEditTaskDialogOpen}
