@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon, Clock } from 'lucide-react';
+import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { Button } from '@/components/ui/button';
@@ -28,8 +28,7 @@ const HomePage = () => {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    setCurrentTime(`${hours}:${minutes}:${seconds}`);
+    setCurrentTime(`${hours}:${minutes}`);
   };
 
   const handleModeSelect = (selectedMode: 'shopping' | 'tasks') => {
@@ -73,13 +72,12 @@ const HomePage = () => {
         </div>
       </header>
 
+      {/* Small clock below settings button */}
+      <div className="flex justify-center mt-2">
+        <div className="text-sm font-medium text-muted-foreground">{currentTime}</div>
+      </div>
+
       <main className="flex-1 flex flex-col items-center justify-center">
-        {/* Clock */}
-        <div className="mb-12 flex flex-col items-center">
-          <Clock className="h-12 w-12 mb-2" />
-          <div className="text-4xl font-bold tracking-wider">{currentTime}</div>
-        </div>
-        
         <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-center justify-center w-full max-w-2xl mx-auto px-4">
           {/* Shopping mode card */}
           <div 
