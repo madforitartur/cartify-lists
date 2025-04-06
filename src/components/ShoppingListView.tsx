@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -145,6 +146,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
             <TabsTrigger 
               value="all" 
               className={`flex items-center ${mode === 'tasks' ? `data-[state=active]:bg-opacity-10 data-[state=active]:${getAccentColorClass(mode, 'bg')} data-[state=active]:${getAccentColorClass(mode, 'text')}` : ''}`}
+              onClick={(e) => e.stopPropagation()}
             >
               <LayoutList className="mr-2 h-4 w-4" />
               Todos ({filteredItems.length})
@@ -152,6 +154,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
             <TabsTrigger 
               value="pending" 
               className={`flex items-center ${mode === 'tasks' ? `data-[state=active]:bg-opacity-10 data-[state=active]:${getAccentColorClass(mode, 'bg')} data-[state=active]:${getAccentColorClass(mode, 'text')}` : ''}`}
+              onClick={(e) => e.stopPropagation()}
             >
               {mode === 'shopping' ? (
                 <ShoppingBag className="mr-2 h-4 w-4" />
@@ -163,6 +166,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
             <TabsTrigger 
               value="completed" 
               className={`flex items-center ${mode === 'tasks' ? `data-[state=active]:bg-opacity-10 data-[state=active]:${getAccentColorClass(mode, 'bg')} data-[state=active]:${getAccentColorClass(mode, 'text')}` : ''}`}
+              onClick={(e) => e.stopPropagation()}
             >
               <Check className="mr-2 h-4 w-4" />
               Concluídos ({completedItems.length})

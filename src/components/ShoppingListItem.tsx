@@ -48,7 +48,10 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({ item, listId, onEdi
         </div>
         
         <div className="flex items-center mt-2 md:mt-0">
-          <div className="flex space-x-1 mr-4">
+          <div className="font-medium mr-4">
+            {formatCurrency(item.price * item.quantity)}
+          </div>
+          <div className="flex space-x-1">
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={(e) => {
               e.stopPropagation();
               onEdit(item);
@@ -66,9 +69,6 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({ item, listId, onEdi
             >
               <Trash2 className="h-4 w-4" />
             </Button>
-          </div>
-          <div className="font-medium">
-            {formatCurrency(item.price * item.quantity)}
           </div>
         </div>
       </div>
