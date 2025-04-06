@@ -32,7 +32,9 @@ const HomePage = () => {
   };
 
   const handleModeSelect = (selectedMode: 'shopping' | 'tasks') => {
+    // Only set the mode without selecting a specific list
     setMode(selectedMode);
+    // Navigate to the lists page instead of directly selecting a list
     navigate('/lists');
   };
 
