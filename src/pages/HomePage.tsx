@@ -1,18 +1,45 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, CheckSquare } from 'lucide-react';
+import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon, Clock } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAppMode } from '@/contexts/AppModeContext';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { settings } = useTheme();
+  const { settings, setMode: setThemeMode } = useTheme();
   const { setMode } = useAppMode();
+  const [currentTime, setCurrentTime] = useState<string>('');
+
+  useEffect(() => {
+    // Initialize the clock
+    updateTime();
+    
+    // Update the clock every second
+    const interval = setInterval(updateTime, 1000);
+    
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  const updateTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    setCurrentTime(`${hours}:${minutes}:${seconds}`);
+  };
 
   const handleModeSelect = (selectedMode: 'shopping' | 'tasks') => {
     setMode(selectedMode);
     navigate('/lists');
+  };
+
+  const toggleTheme = () => {
+    const newMode = settings.mode === 'dark' ? 'light' : 'dark';
+    setThemeMode(newMode);
   };
 
   return (
@@ -23,11 +50,37 @@ const HomePage = () => {
             <ShoppingCart className="h-6 w-6 text-primary mr-2" />
             <h1 className="text-xl font-bold">Cartify</h1>
           </div>
+          <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleTheme}
+              aria-label={settings.mode === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            >
+              {settings.mode === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/settings" className="flex items-center">
+                <SettingsIcon className="mr-2 h-4 w-4" />
+                Configurações
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center">
-        <div className="flex flex-col md:flex-row gap-10 md:gap-20 items-center justify-center w-full max-w-2xl mx-auto px-4">
+      <main className="flex-1 flex flex-col items-center justify-center">
+        {/* Clock */}
+        <div className="mb-12 flex flex-col items-center">
+          <Clock className="h-12 w-12 mb-2" />
+          <div className="text-4xl font-bold tracking-wider">{currentTime}</div>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-center justify-center w-full max-w-2xl mx-auto px-4">
           {/* Shopping mode card */}
           <div 
             onClick={() => handleModeSelect('shopping')}

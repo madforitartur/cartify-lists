@@ -37,8 +37,11 @@ const ListSelectorCard = ({ list, isActive, onEdit, showType = false }: ListSele
   const { getAccentColorClass } = useTheme();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   
-  const handleSelect = () => {
-    setActiveListId(list.id);
+  const handleSelect = (e: React.MouseEvent) => {
+    // Only proceed if the click is directly on the card or its non-interactive elements
+    if ((e.target as HTMLElement).closest('[data-no-select]') === null) {
+      setActiveListId(list.id);
+    }
   };
 
   const handleDelete = () => {
@@ -107,34 +110,25 @@ const ListSelectorCard = ({ list, isActive, onEdit, showType = false }: ListSele
           </div>
           
           <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuTrigger asChild data-no-select>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreVertical className="h-4 w-4" />
                 <span className="sr-only">Abrir menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}>
+              <DropdownMenuItem onClick={() => onEdit()}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Editar
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => {
-                e.stopPropagation();
-                handleCopyToClipboard();
-              }}>
+              <DropdownMenuItem onClick={handleCopyToClipboard}>
                 <Check className="mr-2 h-4 w-4" />
                 Copiar para área de transferência
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDeleteDialogOpen(true);
-                }}
+                onClick={() => setDeleteDialogOpen(true)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Excluir
@@ -160,7 +154,7 @@ const ListSelectorCard = ({ list, isActive, onEdit, showType = false }: ListSele
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+        <AlertDialogContent data-no-select onClick={(e) => e.stopPropagation()}>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
@@ -168,12 +162,9 @@ const ListSelectorCard = ({ list, isActive, onEdit, showType = false }: ListSele
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete();
-              }}
+              onClick={handleDelete}
               className="bg-red-600 hover:bg-red-700"
             >
               Excluir

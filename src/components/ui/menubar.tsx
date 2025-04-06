@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
@@ -76,10 +75,7 @@ const MenubarSubContent = React.forwardRef<
       "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className
     )}
-    onClick={(e) => {
-      // Stop propagation to prevent clicks from reaching elements behind
-      e.stopPropagation();
-    }}
+    onClick={(e) => e.stopPropagation()}
     {...props}
   />
 ))
@@ -103,10 +99,7 @@ const MenubarContent = React.forwardRef<
           "z-50 min-w-[12rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className
         )}
-        onClick={(e) => {
-          // Stop propagation to prevent clicks from reaching elements behind
-          e.stopPropagation();
-        }}
+        onClick={(e) => e.stopPropagation()}
         {...props}
       />
     </MenubarPrimitive.Portal>
@@ -128,7 +121,6 @@ const MenubarItem = React.forwardRef<
       className
     )}
     onClick={(e) => {
-      // Stop propagation to prevent clicks from reaching elements behind
       e.stopPropagation();
       onClick?.(e);
     }}
@@ -149,7 +141,6 @@ const MenubarCheckboxItem = React.forwardRef<
     )}
     checked={checked}
     onClick={(e) => {
-      // Stop propagation to prevent clicks from reaching elements behind
       e.stopPropagation();
       onClick?.(e);
     }}
@@ -176,7 +167,6 @@ const MenubarRadioItem = React.forwardRef<
       className
     )}
     onClick={(e) => {
-      // Stop propagation to prevent clicks from reaching elements behind
       e.stopPropagation();
       onClick?.(e);
     }}
