@@ -47,8 +47,8 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({ item, listId, onEdi
           </div>
         </div>
         
-        <div className="flex items-center mt-2 md:mt-0">
-          <div className="font-medium mr-4">
+        <div className="flex items-center justify-between mt-2 md:mt-0 w-full md:w-auto">
+          <div className="font-medium text-primary md:mr-4">
             {formatCurrency(item.price * item.quantity)}
           </div>
           <div className="flex space-x-1">

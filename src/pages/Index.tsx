@@ -37,7 +37,8 @@ const AppContent: React.FC<{
     e.stopPropagation();
   };
 
-  const toggleTheme = () => {
+  const toggleTheme = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent bubbling
     const newMode = settings.mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
   };
@@ -65,13 +66,13 @@ const AppContent: React.FC<{
               )}
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/" className="flex items-center">
+              <Link to="/" className="flex items-center" onClick={(e) => e.stopPropagation()}>
                 <Home className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Início</span>
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/settings" className="flex items-center">
+              <Link to="/settings" className="flex items-center" onClick={(e) => e.stopPropagation()}>
                 <SettingsIcon className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Configurações</span>
               </Link>
@@ -82,6 +83,7 @@ const AppContent: React.FC<{
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center"
+                onClick={(e) => e.stopPropagation()}
               >
                 <Github className="mr-2 h-4 w-4" />
                 GitHub
