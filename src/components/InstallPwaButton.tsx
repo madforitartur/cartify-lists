@@ -4,9 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from "sonner";
 
+// Definindo a interface para o evento BeforeInstallPrompt
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+// Adicionando a interface global para o window
+declare global {
+  interface WindowEventMap {
+    'beforeinstallprompt': BeforeInstallPromptEvent;
+    'appinstalled': Event;
+  }
 }
 
 const InstallPwaButton = () => {
@@ -17,14 +26,17 @@ const InstallPwaButton = () => {
   useEffect(() => {
     // Check if the app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log("Aplicativo já está instalado (modo standalone)");
       setIsInstalled(true);
       return;
     }
 
     // Store the install prompt event for later use
-    const handleBeforeInstallPrompt = (e: Event) => {
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
-      setInstallPrompt(e as BeforeInstallPromptEvent);
+      console.log("Evento beforeinstallprompt capturado", e);
+      setInstallPrompt(e);
       setIsInstallable(true);
     };
 
@@ -33,37 +45,65 @@ const InstallPwaButton = () => {
 
     // Listen for app install
     window.addEventListener('appinstalled', () => {
+      console.log("Aplicativo instalado com sucesso");
       toast.success("Aplicativo instalado com sucesso!");
       setIsInstalled(true);
       setIsInstallable(false);
     });
 
+    // Verificação adicional de compatibilidade
+    const checkPwaCompat = () => {
+      const isPwa = 
+        'serviceWorker' in navigator && 
+        window.matchMedia('(display-mode: browser)').matches &&
+        !isInstalled;
+      
+      console.log("Compatibilidade PWA:", {
+        serviceWorker: 'serviceWorker' in navigator,
+        browserMode: window.matchMedia('(display-mode: browser)').matches,
+        notInstalled: !isInstalled
+      });
+      
+      return isPwa;
+    };
+    
+    // Se o prompt não for acionado automaticamente em alguns navegadores
+    if (!isInstallable && !isInstalled && checkPwaCompat()) {
+      console.log("PWA é compatível, mas o prompt não foi acionado automaticamente");
+    }
+
+    // Cleanup
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [isInstalled]);
 
   const handleInstall = async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      console.log("Nenhum prompt de instalação disponível");
+      return;
+    }
 
+    console.log("Mostrando prompt de instalação");
     // Show the install prompt
     await installPrompt.prompt();
 
     // Wait for the user to respond to the prompt
     const choiceResult = await installPrompt.userChoice;
+    console.log("Resultado da escolha do usuário:", choiceResult.outcome);
 
     // Reset the install prompt - it can only be used once
     setInstallPrompt(null);
 
     if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+      console.log('Usuário aceitou a instalação');
     } else {
-      console.log('User dismissed the install prompt');
+      console.log('Usuário recusou a instalação');
       toast.error("Instalação cancelada");
     }
   };
 
-  // If already installed, show installed message
+  // Se já instalado, mostrar mensagem instalado
   if (isInstalled) {
     return (
       <Button 
@@ -77,7 +117,7 @@ const InstallPwaButton = () => {
     );
   }
 
-  // If not installable, show a message
+  // Se não for instalável, mostrar mensagem
   if (!isInstallable) {
     return (
       <Button 
