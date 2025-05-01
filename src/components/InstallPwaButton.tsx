@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -32,6 +33,7 @@ const InstallPwaButton = () => {
 
     // Listen for app install
     window.addEventListener('appinstalled', () => {
+      toast.success("Aplicativo instalado com sucesso!");
       setIsInstalled(true);
       setIsInstallable(false);
     });
@@ -57,12 +59,37 @@ const InstallPwaButton = () => {
       console.log('User accepted the install prompt');
     } else {
       console.log('User dismissed the install prompt');
+      toast.error("Instalação cancelada");
     }
   };
 
-  // If not installable or already installed, don't show the button
-  if (!isInstallable || isInstalled) {
-    return null;
+  // If already installed, show installed message
+  if (isInstalled) {
+    return (
+      <Button 
+        variant="outline"
+        className="flex items-center gap-2 w-full opacity-70 cursor-not-allowed"
+        disabled
+      >
+        <Download className="h-4 w-4" />
+        Aplicativo já instalado
+      </Button>
+    );
+  }
+
+  // If not installable, show a message
+  if (!isInstallable) {
+    return (
+      <Button 
+        variant="outline"
+        className="flex items-center gap-2 w-full opacity-70 cursor-not-allowed"
+        disabled
+        title="Este navegador não suporta instalação de PWA ou o aplicativo já está instalado"
+      >
+        <Download className="h-4 w-4" />
+        Instalação não disponível
+      </Button>
+    );
   }
 
   return (

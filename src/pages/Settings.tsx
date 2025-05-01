@@ -57,9 +57,9 @@ const Settings = () => {
               <div>
                 <Label className="mb-2 block">Cor de Destaque para Compras</Label>
                 <RadioGroup 
-                  defaultValue={settings.accentColors.shopping} 
-                  value={settings.accentColors.shopping}
-                  onValueChange={(value) => setAccentColor('shopping', value)}
+                  defaultValue={settings.shoppingAccentColor} 
+                  value={settings.shoppingAccentColor}
+                  onValueChange={(value) => setAccentColor('shopping', value as any)}
                   className="flex flex-wrap gap-3"
                 >
                   <div className="flex items-center space-x-2">
@@ -105,10 +105,10 @@ const Settings = () => {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="amber" id="amber" className="text-amber-500 border-amber-500" />
+                    <RadioGroupItem value="orange" id="amber" className="text-orange-500 border-orange-500" />
                     <Label htmlFor="amber" className="flex items-center cursor-pointer">
-                      <span className="h-4 w-4 rounded-full bg-amber-500 mr-2"></span>
-                      Âmbar
+                      <span className="h-4 w-4 rounded-full bg-orange-500 mr-2"></span>
+                      Laranja
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -124,9 +124,9 @@ const Settings = () => {
               <div>
                 <Label className="mb-2 block">Cor de Destaque para Tarefas</Label>
                 <RadioGroup 
-                  defaultValue={settings.accentColors.tasks} 
-                  value={settings.accentColors.tasks}
-                  onValueChange={(value) => setAccentColor('tasks', value)}
+                  defaultValue={settings.tasksAccentColor}
+                  value={settings.tasksAccentColor}
+                  onValueChange={(value) => setAccentColor('tasks', value as any)}
                   className="flex flex-wrap gap-3"
                 >
                   <div className="flex items-center space-x-2">
