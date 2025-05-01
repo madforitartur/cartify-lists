@@ -1,12 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle,
+  SheetFooter
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,7 +29,7 @@ import { useShoppingList } from '@/contexts/shopping-list';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, X } from 'lucide-react';
 
 interface AddEditTaskDialogProps {
   open: boolean;
@@ -155,20 +155,32 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className={`sm:max-w-[500px] ${isMobile ? 'top-[5%] translate-y-0' : ''}`}
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="h-[100dvh] flex flex-col p-0"
+        onClick={(e) => e.stopPropagation()}
       >
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle className="text-orange-600">
+        <SheetHeader className="border-b p-4 sticky top-0 bg-background z-10">
+          <div className="flex justify-between items-center">
+            <SheetTitle className="text-center w-full text-orange-600 text-xl">
               {isEditMode ? 'Editar Tarefa' : 'Adicionar Tarefa'}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="task-name" className="text-right">
+            </SheetTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="absolute right-4" 
+              onClick={() => onOpenChange(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </SheetHeader>
+        
+        <div className="flex-1 overflow-y-auto p-4">
+          <form id="taskForm" onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-3">
+              <Label htmlFor="task-name" className="text-base font-medium">
                 Nome
               </Label>
               <Input
@@ -176,14 +188,14 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
                 name="name"
                 value={formState.name}
                 onChange={handleChange}
-                className="col-span-3"
                 placeholder="Ex: Enviar email para equipe"
+                className="border-purple-300 focus:border-purple-500"
                 autoFocus
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="task-description" className="text-right">
+            <div className="space-y-3">
+              <Label htmlFor="task-description" className="text-base font-medium">
                 Descrição
               </Label>
               <Textarea
@@ -192,19 +204,19 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
                 value={formState.description}
                 onChange={handleChange}
                 placeholder="Detalhes adicionais sobre a tarefa..."
-                className="col-span-3 resize-none min-h-[80px]"
+                className="resize-none min-h-[100px] border-purple-300 focus:border-purple-500"
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="task-priority" className="text-right">
+            <div className="space-y-3">
+              <Label htmlFor="task-priority" className="text-base font-medium">
                 Prioridade
               </Label>
               <Select
                 value={formState.priority}
                 onValueChange={value => handleSelectChange('priority', value)}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="w-full border-purple-300 focus:border-purple-500">
                   <SelectValue placeholder="Selecione a prioridade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -217,15 +229,15 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
               </Select>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="task-category" className="text-right">
+            <div className="space-y-3">
+              <Label htmlFor="task-category" className="text-base font-medium">
                 Categoria
               </Label>
               <Select
                 value={formState.category}
                 onValueChange={value => handleSelectChange('category', value)}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="w-full border-purple-300 focus:border-purple-500">
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -238,58 +250,58 @@ const AddEditTaskDialog: React.FC<AddEditTaskDialogProps> = ({
               </Select>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">
+            <div className="space-y-3">
+              <Label className="text-base font-medium">
                 Prazo
               </Label>
-              <div className="col-span-3">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formState.dueDate ? (
-                        format(formState.dueDate, "PPP", { locale: ptBR })
-                      ) : (
-                        <span>Selecione uma data</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formState.dueDate}
-                      onSelect={handleDateChange}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal border-purple-300 focus:border-purple-500"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formState.dueDate ? (
+                      format(formState.dueDate, "PPP", { locale: ptBR })
+                    ) : (
+                      <span>Selecione uma data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 z-50" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formState.dueDate}
+                    onSelect={handleDateChange}
+                    initialFocus
+                    className="z-50"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={!formState.name.trim()}
-              className="bg-orange-500 hover:bg-orange-600"
-            >
-              {isEditMode ? 'Atualizar' : 'Adicionar'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </form>
+        </div>
+        
+        <SheetFooter className="flex flex-col gap-2 p-4 mt-auto border-t">
+          <Button 
+            type="submit" 
+            form="taskForm"
+            disabled={!formState.name.trim()}
+            className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base"
+          >
+            {isEditMode ? 'Atualizar' : 'Adicionar'}
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="w-full h-12 text-base"
+          >
+            Cancelar
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

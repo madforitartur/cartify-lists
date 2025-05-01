@@ -1,258 +1,215 @@
 
 import React from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAppMode } from '@/contexts/AppModeContext';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Select, 
-  SelectContent, 
-  SelectGroup, 
-  SelectItem, 
-  SelectLabel, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, ArrowLeft, Palette, Download } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Home, Sun, Moon } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import AppModeToggle from '@/components/AppModeToggle';
+import { Link } from 'react-router-dom';
+import InstallPwaButton from '@/components/InstallPwaButton';
 
 const Settings = () => {
-  const { settings, setMode, setCurrency, setAccentColor } = useTheme();
-  const { mode } = useAppMode();
-  
-  // Color mapping for visual display of color options with more colors
-  const colorClasses = {
-    purple: 'bg-purple-500',
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    red: 'bg-red-500',
-    orange: 'bg-orange-500',
-    pink: 'bg-pink-500',
-    teal: 'bg-teal-500',
-    indigo: 'bg-indigo-500',
-    yellow: 'bg-yellow-500',
-    lime: 'bg-lime-500',
-    emerald: 'bg-emerald-500',
-    cyan: 'bg-cyan-500',
-    sky: 'bg-sky-500',
-    violet: 'bg-violet-500',
-    fuchsia: 'bg-fuchsia-500',
-    rose: 'bg-rose-500'
-  };
-  
-  // Define a consistent color order with more colors
-  const colorOrder = [
-    'purple', 'blue', 'green', 'red', 'orange', 'pink', 'teal', 'indigo',
-    'yellow', 'lime', 'emerald', 'cyan', 'sky', 'violet', 'fuchsia', 'rose'
-  ];
+  const { settings, setAccentColor, setMode } = useTheme();
 
-  // PWA installation logic
-  const [deferredPrompt, setDeferredPrompt] = React.useState<any>(null);
-  const [isInstallable, setIsInstallable] = React.useState(false);
-
-  React.useEffect(() => {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault();
-      // Stash the event so it can be triggered later
-      setDeferredPrompt(e);
-      // Update UI to notify the user they can add to home screen
-      setIsInstallable(true);
-    });
-
-    window.addEventListener('appinstalled', () => {
-      // Log install to analytics
-      console.log('PWA was installed');
-      setIsInstallable(false);
-    });
-  }, []);
-
-  const handleInstallClick = () => {
-    if (!deferredPrompt) return;
-
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-      // Clear the saved prompt as it can't be used again
-      setDeferredPrompt(null);
-    });
-  };
-  
   return (
-    <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
-      <div className="mb-6">
-        <Button variant="ghost" asChild className="mb-4">
-          <a href="/">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-          </a>
-        </Button>
-        <h1 className="text-3xl font-bold mb-2">Configurações</h1>
-        <p className="text-muted-foreground">Personalize sua experiência com o Cartify</p>
-      </div>
+    <div className="min-h-screen bg-background dark:bg-slate-900 dark:text-white flex flex-col">
+      <header className="bg-white dark:bg-slate-800 border-b py-4 px-4 sm:px-6 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <h1 className="text-xl font-bold">Configurações</h1>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/" className="flex items-center">
+              <Home className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Início</span>
+            </Link>
+          </Button>
+        </div>
+      </header>
 
-      <div className="grid gap-6">
-        {/* Theme Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              {settings.mode === 'dark' ? (
-                <Moon className="mr-2 h-5 w-5" />
-              ) : (
-                <Sun className="mr-2 h-5 w-5" />
-              )}
-              Aparência
-            </CardTitle>
-            <CardDescription>
-              Altere entre os temas claro e escuro
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                variant={settings.mode === 'light' ? 'default' : 'outline'}
-                className="flex flex-col items-center justify-center h-24 gap-2"
-                onClick={() => setMode('light')}
-              >
-                <Sun className="h-6 w-6" />
-                <span>Claro</span>
-              </Button>
-              <Button
-                variant={settings.mode === 'dark' ? 'default' : 'outline'} 
-                className="flex flex-col items-center justify-center h-24 gap-2"
-                onClick={() => setMode('dark')}
-              >
-                <Moon className="h-6 w-6" />
-                <span>Escuro</span>
-              </Button>
+      <main className="flex-1 p-4 sm:p-6">
+        <div className="max-w-2xl mx-auto space-y-8">
+          <section className="space-y-4">
+            <h2 className="text-lg font-medium">Modo da Aplicação</h2>
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border">
+              <AppModeToggle />
             </div>
-          </CardContent>
-        </Card>
+          </section>
 
-        {/* PWA Installation */}
-        {isInstallable && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Download className="mr-2 h-5 w-5" />
-                Instalar Aplicativo
-              </CardTitle>
-              <CardDescription>
-                Instale o Cartify no seu dispositivo para acesso rápido
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-center">
+          <section className="space-y-4">
+            <h2 className="text-lg font-medium">Tema</h2>
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border space-y-4">
+              <div className="flex items-center justify-between">
+                <span>Modo Escuro</span>
                 <Button 
-                  onClick={handleInstallClick} 
-                  className="flex items-center gap-2"
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => setMode(settings.mode === 'dark' ? 'light' : 'dark')}
+                  aria-label={settings.mode === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
                 >
-                  <Download className="h-5 w-5" />
-                  Instalar Cartify
+                  {settings.mode === 'dark' ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Currency Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Moeda</CardTitle>
-            <CardDescription>
-              Selecione a moeda a ser utilizada no aplicativo
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="currency">Moeda</Label>
-                <Select 
-                  value={settings.currency} 
-                  onValueChange={(value) => setCurrency(value as any)}
+              
+              <div>
+                <Label className="mb-2 block">Cor de Destaque para Compras</Label>
+                <RadioGroup 
+                  defaultValue={settings.accentColors.shopping} 
+                  value={settings.accentColors.shopping}
+                  onValueChange={(value) => setAccentColor('shopping', value)}
+                  className="flex flex-wrap gap-3"
                 >
-                  <SelectTrigger id="currency">
-                    <SelectValue placeholder="Selecione uma moeda" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Moedas</SelectLabel>
-                      <SelectItem value="BRL">Real Brasileiro (R$)</SelectItem>
-                      <SelectItem value="USD">Dólar Americano ($)</SelectItem>
-                      <SelectItem value="EUR">Euro (€)</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="blue" id="blue" className="text-blue-500 border-blue-500" />
+                    <Label htmlFor="blue" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-blue-500 mr-2"></span>
+                      Azul
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="green" id="green" className="text-green-500 border-green-500" />
+                    <Label htmlFor="green" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-green-500 mr-2"></span>
+                      Verde
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="purple" id="purple" className="text-purple-500 border-purple-500" />
+                    <Label htmlFor="purple" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-purple-500 mr-2"></span>
+                      Roxo
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="red" id="red" className="text-red-500 border-red-500" />
+                    <Label htmlFor="red" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-red-500 mr-2"></span>
+                      Vermelho
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pink" id="pink" className="text-pink-500 border-pink-500" />
+                    <Label htmlFor="pink" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-pink-500 mr-2"></span>
+                      Rosa
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="teal" id="teal" className="text-teal-500 border-teal-500" />
+                    <Label htmlFor="teal" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-teal-500 mr-2"></span>
+                      Teal
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="amber" id="amber" className="text-amber-500 border-amber-500" />
+                    <Label htmlFor="amber" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-amber-500 mr-2"></span>
+                      Âmbar
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="indigo" id="indigo" className="text-indigo-500 border-indigo-500" />
+                    <Label htmlFor="indigo" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-indigo-500 mr-2"></span>
+                      Índigo
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div>
+                <Label className="mb-2 block">Cor de Destaque para Tarefas</Label>
+                <RadioGroup 
+                  defaultValue={settings.accentColors.tasks} 
+                  value={settings.accentColors.tasks}
+                  onValueChange={(value) => setAccentColor('tasks', value)}
+                  className="flex flex-wrap gap-3"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="orange" id="tasks-orange" className="text-orange-500 border-orange-500" />
+                    <Label htmlFor="tasks-orange" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-orange-500 mr-2"></span>
+                      Laranja
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="green" id="tasks-green" className="text-green-500 border-green-500" />
+                    <Label htmlFor="tasks-green" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-green-500 mr-2"></span>
+                      Verde
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="purple" id="tasks-purple" className="text-purple-500 border-purple-500" />
+                    <Label htmlFor="tasks-purple" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-purple-500 mr-2"></span>
+                      Roxo
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="blue" id="tasks-blue" className="text-blue-500 border-blue-500" />
+                    <Label htmlFor="tasks-blue" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-blue-500 mr-2"></span>
+                      Azul
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="red" id="tasks-red" className="text-red-500 border-red-500" />
+                    <Label htmlFor="tasks-red" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-red-500 mr-2"></span>
+                      Vermelho
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pink" id="tasks-pink" className="text-pink-500 border-pink-500" />
+                    <Label htmlFor="tasks-pink" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-pink-500 mr-2"></span>
+                      Rosa
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="teal" id="tasks-teal" className="text-teal-500 border-teal-500" />
+                    <Label htmlFor="tasks-teal" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-teal-500 mr-2"></span>
+                      Teal
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="amber" id="tasks-amber" className="text-amber-500 border-amber-500" />
+                    <Label htmlFor="tasks-amber" className="flex items-center cursor-pointer">
+                      <span className="h-4 w-4 rounded-full bg-amber-500 mr-2"></span>
+                      Âmbar
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </section>
 
-        {/* Colors Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Palette className="mr-2 h-5 w-5" />
-              Cores
-            </CardTitle>
-            <CardDescription>
-              Personalize as cores dos modos Compras e Tarefas
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-6">
-              <div className="space-y-2">
-                <Label>Cor do Modo Compras</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {colorOrder.map((color) => (
-                    <Button 
-                      key={color}
-                      variant="outline"
-                      className={`h-10 w-full ${
-                        color === settings.shoppingAccentColor ? 'ring-2 ring-offset-2' : ''
-                      } ${colorClasses[color as keyof typeof colorClasses]}`}
-                      onClick={() => setAccentColor('shopping', color as any)}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Cor do Modo Tarefas</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {colorOrder.map((color) => (
-                    <Button 
-                      key={color}
-                      variant="outline"
-                      className={`h-10 w-full ${
-                        color === settings.tasksAccentColor ? 'ring-2 ring-offset-2' : ''
-                      } ${colorClasses[color as keyof typeof colorClasses]}`}
-                      onClick={() => setAccentColor('tasks', color as any)}
-                    />
-                  ))}
-                </div>
-              </div>
+          <section className="space-y-4">
+            <h2 className="text-lg font-medium">Instalar Aplicação</h2>
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border">
+              <p className="text-sm text-muted-foreground mb-4">
+                Instale o Cartify no seu dispositivo para usar offline e ter uma experiência melhorada.
+              </p>
+              <InstallPwaButton />
             </div>
-          </CardContent>
-          <CardFooter>
-            <p className="text-sm text-muted-foreground">
-              As alterações são salvas automaticamente.
-            </p>
-          </CardFooter>
-        </Card>
-      </div>
+          </section>
+          
+          <section className="space-y-4">
+            <h2 className="text-lg font-medium">Sobre</h2>
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border">
+              <p className="text-sm text-muted-foreground">
+                Cartify v1.0.0 - Uma aplicação para gerenciar listas de compras e tarefas.
+              </p>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
   );
 };

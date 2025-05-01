@@ -1,12 +1,12 @@
 
 import React, { useEffect } from 'react';
 import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle,
+  SheetFooter
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +23,7 @@ import { getCategoryOptions, CATEGORIES } from '@/utils/categories';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAppMode } from '@/contexts/AppModeContext';
 import AddEditTaskDialog from './AddEditTaskDialog';
+import { X } from 'lucide-react';
 
 interface AddEditItemDialogProps {
   open: boolean;
@@ -178,20 +179,32 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className={`sm:max-w-[500px] ${isMobile ? 'top-[5%] translate-y-0' : ''}`}
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="h-[100dvh] flex flex-col p-0"
+        onClick={(e) => e.stopPropagation()}
       >
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>
+        <SheetHeader className="border-b p-4 sticky top-0 bg-background z-10">
+          <div className="flex justify-between items-center">
+            <SheetTitle className="text-center w-full text-xl">
               {isEditMode ? 'Editar Item' : 'Adicionar Item'}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="item-name" className="text-right">
+            </SheetTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="absolute right-4" 
+              onClick={() => onOpenChange(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </SheetHeader>
+        
+        <div className="flex-1 overflow-y-auto p-4">
+          <form id="itemForm" onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-3">
+              <Label htmlFor="item-name" className="text-base font-medium">
                 Nome
               </Label>
               <Input
@@ -199,21 +212,21 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 name="name"
                 value={formState.name}
                 onChange={handleChange}
-                className="col-span-3"
+                className="border-primary focus:border-primary"
                 placeholder="Ex: Maçã"
                 autoFocus
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="item-category" className="text-right">
+            <div className="space-y-3">
+              <Label htmlFor="item-category" className="text-base font-medium">
                 Categoria
               </Label>
               <Select
                 value={formState.category}
                 onValueChange={value => handleSelectChange('category', value)}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="w-full border-primary focus:border-primary">
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,16 +239,38 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
               </Select>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="item-quantity" className="text-right">
-                Quantidade
-              </Label>
-              <div className="col-span-1 flex items-center">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="item-quantity" className="text-base font-medium">
+                  Quantidade
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="item-unit" className="text-base font-medium">
+                    Unidade
+                  </Label>
+                  <Select
+                    value={formState.unit}
+                    onValueChange={value => handleSelectChange('unit', value)}
+                  >
+                    <SelectTrigger className="w-24 border-primary focus:border-primary">
+                      <SelectValue placeholder="Unidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UNITS.map(unit => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-center">
                 <Button 
                   type="button"
                   variant="outline" 
                   size="icon" 
-                  className="h-8 w-8 rounded-r-none"
+                  className="h-10 w-10 rounded-r-none"
                   onClick={decrementQuantity}
                 >
                   -
@@ -248,41 +283,23 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                   step={getQuantityStep()}
                   value={formState.quantity}
                   onChange={handleChange}
-                  className="h-8 rounded-none w-16 text-center"
+                  className="h-10 rounded-none text-center border-x-0"
+                  style={{ width: '100%' }}
                 />
                 <Button 
                   type="button"
                   variant="outline" 
                   size="icon" 
-                  className="h-8 w-8 rounded-l-none"
+                  className="h-10 w-10 rounded-l-none"
                   onClick={incrementQuantity}
                 >
                   +
                 </Button>
               </div>
-              
-              <Label htmlFor="item-unit" className="text-right">
-                Unidade
-              </Label>
-              <Select
-                value={formState.unit}
-                onValueChange={value => handleSelectChange('unit', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Unidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNITS.map(unit => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="item-price" className="text-right">
+            <div className="space-y-3">
+              <Label htmlFor="item-price" className="text-base font-medium">
                 Preço (€)
               </Label>
               <Input
@@ -294,27 +311,33 @@ const AddEditItemDialog: React.FC<AddEditItemDialogProps> = ({
                 step="0.01"
                 value={priceInput}
                 onChange={handleChange}
-                className="col-span-3"
+                className="border-primary focus:border-primary"
                 placeholder="0,00"
               />
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={!formState.name.trim()}>
-              {isEditMode ? 'Atualizar' : 'Adicionar'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </form>
+        </div>
+        
+        <SheetFooter className="flex flex-col gap-2 p-4 mt-auto border-t">
+          <Button 
+            type="submit" 
+            form="itemForm"
+            disabled={!formState.name.trim()}
+            className="w-full bg-purple-500 hover:bg-purple-600 h-12 text-base"
+          >
+            {isEditMode ? 'Atualizar' : 'Adicionar'}
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="w-full h-12 text-base"
+          >
+            Cancelar
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

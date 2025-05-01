@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -233,20 +232,22 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ onBackToLists }) =>
         </div>
       )}
 
-      <AddEditItemDialog
-        open={addEditItemDialogOpen}
-        onOpenChange={setAddEditItemDialogOpen}
-        listId={activeListId}
-        itemToEdit={isShoppingItem(itemToEdit as any) ? itemToEdit as ShoppingItem : undefined}
-        mode={mode}
-      />
-      
-      <AddEditTaskDialog
-        open={addEditTaskDialogOpen}
-        onOpenChange={setAddEditTaskDialogOpen}
-        listId={activeListId}
-        itemToEdit={isTaskItem(itemToEdit as any) ? itemToEdit as TaskItem : undefined}
-      />
+      {mode === 'shopping' ? (
+        <AddEditItemDialog
+          open={addEditItemDialogOpen}
+          onOpenChange={setAddEditItemDialogOpen}
+          listId={activeListId}
+          itemToEdit={isShoppingItem(itemToEdit as any) ? itemToEdit as ShoppingItem : undefined}
+          mode={mode}
+        />
+      ) : (
+        <AddEditTaskDialog
+          open={addEditTaskDialogOpen}
+          onOpenChange={setAddEditTaskDialogOpen}
+          listId={activeListId}
+          itemToEdit={isTaskItem(itemToEdit as any) ? itemToEdit as TaskItem : undefined}
+        />
+      )}
     </div>
   );
 };
