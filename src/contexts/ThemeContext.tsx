@@ -4,7 +4,9 @@ import { toast } from "sonner";
 
 type ThemeMode = 'light' | 'dark';
 type CurrencyType = 'BRL' | 'USD' | 'EUR';
-type AccentColor = 'purple' | 'blue' | 'green' | 'red' | 'orange' | 'pink' | 'teal' | 'indigo';
+type AccentColor = 
+  | 'purple' | 'blue' | 'green' | 'red' | 'orange' | 'pink' | 'teal' | 'indigo'
+  | 'yellow' | 'lime' | 'emerald' | 'cyan' | 'sky' | 'violet' | 'fuchsia' | 'rose';
 
 interface ThemeSettings {
   mode: ThemeMode;
@@ -83,6 +85,46 @@ const accentColorMap = {
     text: 'text-indigo-500',
     border: 'border-indigo-500',
   },
+  yellow: {
+    bg: 'bg-yellow-500 hover:bg-yellow-600',
+    text: 'text-yellow-500',
+    border: 'border-yellow-500',
+  },
+  lime: {
+    bg: 'bg-lime-500 hover:bg-lime-600',
+    text: 'text-lime-500',
+    border: 'border-lime-500',
+  },
+  emerald: {
+    bg: 'bg-emerald-500 hover:bg-emerald-600',
+    text: 'text-emerald-500',
+    border: 'border-emerald-500',
+  },
+  cyan: {
+    bg: 'bg-cyan-500 hover:bg-cyan-600',
+    text: 'text-cyan-500',
+    border: 'border-cyan-500',
+  },
+  sky: {
+    bg: 'bg-sky-500 hover:bg-sky-600',
+    text: 'text-sky-500',
+    border: 'border-sky-500',
+  },
+  violet: {
+    bg: 'bg-violet-500 hover:bg-violet-600',
+    text: 'text-violet-500',
+    border: 'border-violet-500',
+  },
+  fuchsia: {
+    bg: 'bg-fuchsia-500 hover:bg-fuchsia-600',
+    text: 'text-fuchsia-500',
+    border: 'border-fuchsia-500',
+  },
+  rose: {
+    bg: 'bg-rose-500 hover:bg-rose-600',
+    text: 'text-rose-500',
+    border: 'border-rose-500',
+  }
 };
 
 // Map currency to symbols

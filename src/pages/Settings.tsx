@@ -21,13 +21,13 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, ArrowLeft, Palette } from 'lucide-react';
+import { Moon, Sun, ArrowLeft, Palette, Download } from 'lucide-react';
 
 const Settings = () => {
   const { settings, setMode, setCurrency, setAccentColor } = useTheme();
   const { mode } = useAppMode();
   
-  // Color mapping for visual display of color options
+  // Color mapping for visual display of color options with more colors
   const colorClasses = {
     purple: 'bg-purple-500',
     blue: 'bg-blue-500',
@@ -36,11 +36,61 @@ const Settings = () => {
     orange: 'bg-orange-500',
     pink: 'bg-pink-500',
     teal: 'bg-teal-500',
-    indigo: 'bg-indigo-500'
+    indigo: 'bg-indigo-500',
+    yellow: 'bg-yellow-500',
+    lime: 'bg-lime-500',
+    emerald: 'bg-emerald-500',
+    cyan: 'bg-cyan-500',
+    sky: 'bg-sky-500',
+    violet: 'bg-violet-500',
+    fuchsia: 'bg-fuchsia-500',
+    rose: 'bg-rose-500'
   };
   
-  // Define a consistent color order for both shopping and tasks modes
-  const colorOrder = ['purple', 'blue', 'green', 'red', 'orange', 'pink', 'teal', 'indigo'];
+  // Define a consistent color order with more colors
+  const colorOrder = [
+    'purple', 'blue', 'green', 'red', 'orange', 'pink', 'teal', 'indigo',
+    'yellow', 'lime', 'emerald', 'cyan', 'sky', 'violet', 'fuchsia', 'rose'
+  ];
+
+  // PWA installation logic
+  const [deferredPrompt, setDeferredPrompt] = React.useState<any>(null);
+  const [isInstallable, setIsInstallable] = React.useState(false);
+
+  React.useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      setDeferredPrompt(e);
+      // Update UI to notify the user they can add to home screen
+      setIsInstallable(true);
+    });
+
+    window.addEventListener('appinstalled', () => {
+      // Log install to analytics
+      console.log('PWA was installed');
+      setIsInstallable(false);
+    });
+  }, []);
+
+  const handleInstallClick = () => {
+    if (!deferredPrompt) return;
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      // Clear the saved prompt as it can't be used again
+      setDeferredPrompt(null);
+    });
+  };
   
   return (
     <div className="w-full max-w-3xl mx-auto p-4 animate-fade-in">
@@ -91,6 +141,32 @@ const Settings = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* PWA Installation */}
+        {isInstallable && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Download className="mr-2 h-5 w-5" />
+                Instalar Aplicativo
+              </CardTitle>
+              <CardDescription>
+                Instale o Cartify no seu dispositivo para acesso rápido
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleInstallClick} 
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-5 w-5" />
+                  Instalar Cartify
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Currency Settings */}
         <Card>

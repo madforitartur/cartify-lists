@@ -40,35 +40,38 @@ const ShoppingListItem: React.FC<ShoppingListItemProps> = ({ item, listId, onEdi
               {category.label}
             </span>
           </div>
-          <div className="text-sm text-muted-foreground flex items-center mt-1">
+        </div>
+        
+        <div className="flex items-center justify-between space-x-4">
+          <div className="text-sm text-muted-foreground flex items-center">
             <span>{item.quantity} {item.unit}</span>
             <span className="mx-2">•</span>
             <span>{formatCurrency(item.price)} / {item.unit}</span>
           </div>
-        </div>
-        
-        <div className="flex items-center justify-between mt-2 md:mt-0 w-full md:w-auto">
-          <div className="font-medium text-primary md:mr-4">
-            {formatCurrency(item.price * item.quantity)}
-          </div>
-          <div className="flex space-x-1">
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={(e) => {
-              e.stopPropagation();
-              onEdit(item);
-            }}>
-              <Edit2 className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-8 w-8 text-destructive" 
-              onClick={(e) => {
+          
+          <div className="flex items-center space-x-4">
+            <div className="font-medium text-primary">
+              {formatCurrency(item.price * item.quantity)}
+            </div>
+            <div className="flex space-x-1">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={(e) => {
                 e.stopPropagation();
-                deleteItem(listId, item.id);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+                onEdit(item);
+              }}>
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8 text-destructive" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteItem(listId, item.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
