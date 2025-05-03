@@ -8,6 +8,9 @@ const AppModeSection = () => {
       <h2 className="text-lg font-medium">Modo da Aplicação</h2>
       <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border">
         <AppModeToggle />
+        <p className="text-xs text-muted-foreground mt-2">
+          Alterne entre os modos de compras e tarefas sem notificações.
+        </p>
       </div>
     </section>
   );

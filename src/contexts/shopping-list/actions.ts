@@ -6,7 +6,8 @@ export const createListAction = (
   name: string, 
   mode: 'shopping' | 'tasks',
   setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>,
-  setActiveListId: (id: string | null) => void
+  setActiveListId: (id: string | null) => void,
+  showToast: boolean = false
 ): ShoppingList => {
   const newList: ShoppingList = {
     id: crypto.randomUUID(),
@@ -19,14 +20,17 @@ export const createListAction = (
 
   setLists(prev => [...prev, newList]);
   setActiveListId(newList.id);
-  toast.success(`Lista "${name}" criada com sucesso!`);
+  if (showToast) {
+    toast.success(`Lista "${name}" criada com sucesso!`);
+  }
   return newList;
 };
 
 export const updateListAction = (
   id: string, 
   name: string,
-  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>
+  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>,
+  showToast: boolean = false
 ) => {
   setLists(prev => 
     prev.map(list => 
@@ -35,7 +39,9 @@ export const updateListAction = (
         : list
     )
   );
-  toast.success(`Lista atualizada com sucesso!`);
+  if (showToast) {
+    toast.success(`Lista atualizada com sucesso!`);
+  }
 };
 
 export const deleteListAction = (
@@ -44,7 +50,8 @@ export const deleteListAction = (
   activeListId: string | null,
   setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>,
   setActiveListId: (id: string | null) => void,
-  getFilteredLists: () => ShoppingList[]
+  getFilteredLists: () => ShoppingList[],
+  showToast: boolean = false
 ) => {
   const listToDelete = lists.find(list => list.id === id);
   
@@ -56,13 +63,16 @@ export const deleteListAction = (
     setActiveListId(remainingLists.length > 0 ? remainingLists[0].id : null);
   }
   
-  toast.success(`Lista "${listToDelete?.name}" removida!`);
+  if (showToast && listToDelete) {
+    toast.success(`Lista "${listToDelete.name}" removida!`);
+  }
 };
 
 export const addItemAction = (
   listId: string, 
   item: Omit<ShoppingItem | TaskItem, 'id'>,
-  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>
+  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>,
+  showToast: boolean = false
 ) => {
   const newItem = {
     ...item,
@@ -106,14 +116,17 @@ export const addItemAction = (
       };
     })
   );
-  toast.success(`Item adicionado à lista!`);
+  if (showToast) {
+    toast.success(`Item adicionado à lista!`);
+  }
 };
 
 export const updateItemAction = (
   listId: string, 
   itemId: string, 
   updatedFields: Partial<ShoppingItem | TaskItem>,
-  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>
+  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>,
+  showToast: boolean = false
 ) => {
   setLists(prev => 
     prev.map(list => {
@@ -133,14 +146,17 @@ export const updateItemAction = (
       };
     })
   );
-  toast.success(`Item atualizado com sucesso!`);
+  if (showToast) {
+    toast.success(`Item atualizado com sucesso!`);
+  }
 };
 
 export const deleteItemAction = (
   listId: string, 
   itemId: string,
   lists: ShoppingList[],
-  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>
+  setLists: React.Dispatch<React.SetStateAction<ShoppingList[]>>,
+  showToast: boolean = false
 ) => {
   const listIndex = lists.findIndex(list => list.id === listId);
   if (listIndex === -1) return;
@@ -161,7 +177,9 @@ export const deleteItemAction = (
     })
   );
   
-  toast.success(`Item "${itemToDelete?.name}" removido!`);
+  if (showToast && itemToDelete) {
+    toast.success(`Item "${itemToDelete.name}" removido!`);
+  }
 };
 
 export const toggleItemCompletionAction = (

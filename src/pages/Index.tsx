@@ -14,6 +14,53 @@ const Index = () => {
   const isMobile = useIsMobile();
   const [showLists, setShowLists] = useState(true);
   
+  // Efeito para configurar a aplicação em modo tela cheia quando em dispositivos móveis
+  useEffect(() => {
+    if (isMobile) {
+      // Define meta tags para comportamento de tela cheia e controle do teclado virtual
+      const metaViewport = document.querySelector('meta[name="viewport"]');
+      if (metaViewport) {
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      }
+      
+      // Adiciona listeners para controlar quando o teclado deve aparecer
+      const inputs = document.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          // Permite que o teclado apareça quando um campo é focado
+          if (metaViewport) {
+            metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+          }
+        });
+        
+        input.addEventListener('blur', () => {
+          // Restaura o comportamento de tela cheia quando o campo perde o foco
+          if (metaViewport) {
+            metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+          }
+        });
+      });
+      
+      // Tenta entrar em modo tela cheia em navegadores que suportam
+      const requestFullscreen = () => {
+        try {
+          const docEl = document.documentElement;
+          if (docEl.requestFullscreen) {
+            docEl.requestFullscreen();
+          }
+        } catch (error) {
+          console.log('Fullscreen not supported');
+        }
+      };
+      
+      // Tenta ativar tela cheia quando o usuário interage com a página
+      document.addEventListener('touchstart', function onFirstTouch() {
+        requestFullscreen();
+        document.removeEventListener('touchstart', onFirstTouch);
+      }, { once: true });
+    }
+  }, [isMobile]);
+  
   return (
     <ShoppingListProvider>
       <AppContent showLists={showLists} setShowLists={setShowLists} />

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 interface AppModeContextType {
   mode: AppMode;
-  setMode: (mode: AppMode) => void;
+  setMode: (mode: AppMode, showToast?: boolean) => void;
   toggleMode: () => void;
 }
 
@@ -37,14 +37,16 @@ export const AppModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
     localStorage.setItem(STORAGE_KEY, mode);
   }, [mode]);
 
-  const setMode = (newMode: AppMode) => {
+  const setMode = (newMode: AppMode, showToast: boolean = false) => {
     setModeState(newMode);
-    toast.success(`Modo alterado para ${newMode === 'shopping' ? 'Compras' : 'Tarefas'}`);
+    if (showToast) {
+      toast.success(`Modo alterado para ${newMode === 'shopping' ? 'Compras' : 'Tarefas'}`);
+    }
   };
 
   const toggleMode = () => {
     const newMode = mode === 'shopping' ? 'tasks' : 'shopping';
-    setMode(newMode);
+    setMode(newMode, false);
   };
 
   return (

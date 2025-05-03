@@ -23,7 +23,8 @@ const AppModeToggle: React.FC = () => {
 
   const handleModeChange = (value: string) => {
     if (value) {
-      setMode(value as 'shopping' | 'tasks');
+      // Chamamos setMode diretamente sem exibir o toast
+      setMode(value as 'shopping' | 'tasks', false);
     }
   };
 
