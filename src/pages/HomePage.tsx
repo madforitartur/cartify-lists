@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, CheckSquare, Github, Settings as SettingsIcon, Sun, Moon, Maximize, Minimize } from 'lucide-react';
