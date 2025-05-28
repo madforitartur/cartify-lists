@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon, Maximize, Minimize } from 'lucide-react';
+import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon, Maximize, Minimize, ArrowLeft } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { Button } from '@/components/ui/button';
@@ -67,11 +68,27 @@ const HomePage = () => {
     }
   };
 
+  const handleBackClick = () => {
+    // Since this is the home page, we can go back in history or do nothing
+    if (window.history.length > 1) {
+      navigate(-1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900 dark:text-white flex flex-col">
       <header className="bg-white dark:bg-slate-800 border-b py-4 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleBackClick}
+              className="mr-2"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <Button 
               variant="ghost" 
               size="icon" 

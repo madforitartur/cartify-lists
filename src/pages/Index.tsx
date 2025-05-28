@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ShoppingListProvider } from '@/contexts/shopping-list';
 import ListSelector from '@/components/ListSelector';
 import ShoppingListView from '@/components/ShoppingListView';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Github, Settings as SettingsIcon, Home, Sun, Moon, Maximize, Minimize } from 'lucide-react';
+import { ShoppingCart, Github, Settings as SettingsIcon, Home, Sun, Moon, Maximize, Minimize, ArrowLeft } from 'lucide-react';
 import { useActiveListNavigation } from '@/hooks/use-active-list-navigation';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -74,6 +75,7 @@ const AppContent: React.FC<{
   const isMobile = useIsMobile();
   const { settings, setMode } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const navigate = useNavigate();
   
   // This hook handles the navigation on mobile when an active list is selected
   useActiveListNavigation(showLists, setShowLists);
@@ -113,12 +115,25 @@ const AppContent: React.FC<{
     const newMode = settings.mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
   };
+
+  const handleBackClick = () => {
+    navigate('/');
+  };
   
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900 dark:text-white flex flex-col">
       <header className="bg-white dark:bg-slate-800 border-b py-4 px-4 sm:px-6 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleBackClick}
+              className="mr-2"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <Button 
               variant="ghost" 
               size="icon" 
