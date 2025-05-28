@@ -1,61 +1,70 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAppMode } from '@/contexts/AppModeContext';
-import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { ShoppingCart, CheckSquare, Github, Settings as SettingsIcon, Sun, Moon, Maximize, Minimize } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const { settings, setMode: setThemeMode } = useTheme();
-  const { setMode } = useAppMode();
-  const [currentTime, setCurrentTime] = useState<string>('');
+  const { settings, setMode } = useTheme();
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Fullscreen functionality
   useEffect(() => {
-    // Initialize the clock
-    updateTime();
-    
-    // Update the clock every second
-    const interval = setInterval(updateTime, 1000);
-    
-    // Clear interval on component unmount
-    return () => clearInterval(interval);
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const updateTime = () => {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    setCurrentTime(`${hours}:${minutes}`);
+  const toggleFullscreen = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Erro ao alternar fullscreen:', error);
+    }
   };
 
-  const handleModeSelect = (selectedMode: 'shopping' | 'tasks') => {
-    // Only set the mode without selecting a specific list
-    setMode(selectedMode);
-    // Navigate to the lists page instead of directly selecting a list
-    navigate('/lists');
-  };
-
-  const toggleTheme = () => {
+  const toggleTheme = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const newMode = settings.mode === 'dark' ? 'light' : 'dark';
-    setThemeMode(newMode);
+    setMode(newMode);
   };
 
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900 dark:text-white flex flex-col">
-      <header className="bg-white dark:bg-slate-800 border-b py-4 px-6">
+      <header className="bg-white dark:bg-slate-800 border-b py-4 px-4 sm:px-6 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleFullscreen}
+              className="mr-2"
+              aria-label={isFullscreen ? 'Sair do modo tela cheia' : 'Entrar no modo tela cheia'}
+            >
+              {isFullscreen ? (
+                <Minimize className="h-5 w-5" />
+              ) : (
+                <Maximize className="h-5 w-5" />
+              )}
+            </Button>
             <ShoppingCart className="h-6 w-6 text-primary mr-2" />
             <h1 className="text-xl font-bold">Cartify</h1>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={toggleTheme}
+              className="hidden sm:flex"
               aria-label={settings.mode === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
             >
               {settings.mode === 'dark' ? (
@@ -65,49 +74,54 @@ const HomePage = () => {
               )}
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/settings" className="flex items-center">
-                <SettingsIcon className="mr-2 h-4 w-4" />
-                Configurações
+              <Link to="/settings" className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                <SettingsIcon className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Configurações</span>
               </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild className="hidden sm:flex">
+              <a 
+                href="https://github.com/your-username/cartify" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Github className="mr-2 h-4 w-4" />
+                GitHub
+              </a>
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Small clock below settings button */}
-      <div className="flex justify-center mt-2">
-        <div className="text-sm font-medium text-muted-foreground">{currentTime}</div>
-      </div>
-
-      <main className="flex-1 flex flex-col items-center justify-center">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-center justify-center w-full max-w-2xl mx-auto px-4">
-          {/* Shopping mode card */}
-          <div 
-            onClick={() => handleModeSelect('shopping')}
-            className={`w-full md:w-1/2 max-w-xs cursor-pointer transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg border p-6 flex flex-col items-center space-y-4 bg-white dark:bg-slate-800 hover:bg-${settings.shoppingAccentColor}-50 dark:hover:bg-${settings.shoppingAccentColor}-950/20`}
-          >
-            <div className={`p-6 rounded-full bg-${settings.shoppingAccentColor}-100 dark:bg-${settings.shoppingAccentColor}-900/20`}>
-              <ShoppingCart 
-                className={`h-16 w-16 text-${settings.shoppingAccentColor}-500`} 
-              />
+      <main className="max-w-7xl mx-auto py-6 flex-grow">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link to="/lists" className="group relative rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-colors overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 dark:border-slate-800">
+            <div className="p-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">Listas de Compras</h3>
+                <p className="text-sm text-muted-foreground">Gerencie suas listas de compras de forma eficiente.</p>
+              </div>
+              <ShoppingCart className="absolute bottom-2 right-2 h-16 w-16 opacity-20 group-hover:opacity-30 transition-opacity" />
             </div>
-            <h2 className="text-xl font-semibold">Compras</h2>
-            <p className="text-center text-muted-foreground">Crie e gerencie suas listas de compras</p>
-          </div>
+            <Button variant="link" className="absolute bottom-4 right-4">
+              Acessar <span aria-hidden="true">→</span>
+            </Button>
+          </Link>
 
-          {/* Tasks mode card */}
-          <div 
-            onClick={() => handleModeSelect('tasks')}
-            className={`w-full md:w-1/2 max-w-xs cursor-pointer transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg border p-6 flex flex-col items-center space-y-4 bg-white dark:bg-slate-800 hover:bg-${settings.tasksAccentColor}-50 dark:hover:bg-${settings.tasksAccentColor}-950/20`}
-          >
-            <div className={`p-6 rounded-full bg-${settings.tasksAccentColor}-100 dark:bg-${settings.tasksAccentColor}-900/20`}>
-              <CheckSquare 
-                className={`h-16 w-16 text-${settings.tasksAccentColor}-500`} 
-              />
+          <Link to="/tasks" className="group relative rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-colors overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 dark:border-slate-800">
+            <div className="p-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">Listas de Tarefas</h3>
+                <p className="text-sm text-muted-foreground">Organize suas tarefas diárias e mantenha-se produtivo.</p>
+              </div>
+              <CheckSquare className="absolute bottom-2 right-2 h-16 w-16 opacity-20 group-hover:opacity-30 transition-opacity" />
             </div>
-            <h2 className="text-xl font-semibold">Tarefas</h2>
-            <p className="text-center text-muted-foreground">Organize suas tarefas diárias</p>
-          </div>
+            <Button variant="link" className="absolute bottom-4 right-4">
+              Acessar <span aria-hidden="true">→</span>
+            </Button>
+          </Link>
         </div>
       </main>
     </div>
