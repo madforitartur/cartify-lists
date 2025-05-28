@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, CheckSquare, Settings as SettingsIcon, Sun, Moon, Maximize, Minimize } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAppMode } from '@/contexts/AppModeContext';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ const HomePage = () => {
   const { settings, setMode: setThemeMode } = useTheme();
   const { setMode } = useAppMode();
   const [currentTime, setCurrentTime] = useState<string>('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     // Initialize the clock
@@ -22,6 +22,16 @@ const HomePage = () => {
     
     // Clear interval on component unmount
     return () => clearInterval(interval);
+  }, []);
+
+  // Fullscreen functionality
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   const updateTime = () => {
@@ -43,11 +53,38 @@ const HomePage = () => {
     setThemeMode(newMode);
   };
 
+  const toggleFullscreen = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Erro ao alternar fullscreen:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900 dark:text-white flex flex-col">
       <header className="bg-white dark:bg-slate-800 border-b py-4 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleFullscreen}
+              className="mr-2"
+              aria-label={isFullscreen ? 'Sair do modo tela cheia' : 'Entrar no modo tela cheia'}
+            >
+              {isFullscreen ? (
+                <Minimize className="h-5 w-5" />
+              ) : (
+                <Maximize className="h-5 w-5" />
+              )}
+            </Button>
             <ShoppingCart className="h-6 w-6 text-primary mr-2" />
             <h1 className="text-xl font-bold">Cartify</h1>
           </div>
