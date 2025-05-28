@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ShoppingListProvider } from '@/contexts/shopping-list';
 import ListSelector from '@/components/ListSelector';
 import ShoppingListView from '@/components/ShoppingListView';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Github, Settings as SettingsIcon, Home, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, Github, Settings as SettingsIcon, Home, Sun, Moon, Maximize, Minimize } from 'lucide-react';
 import { useActiveListNavigation } from '@/hooks/use-active-list-navigation';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Link } from 'react-router-dom';
@@ -74,6 +73,7 @@ const AppContent: React.FC<{
 }> = ({ showLists, setShowLists }) => {
   const isMobile = useIsMobile();
   const { settings, setMode } = useTheme();
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   // This hook handles the navigation on mobile when an active list is selected
   useActiveListNavigation(showLists, setShowLists);
@@ -84,8 +84,32 @@ const AppContent: React.FC<{
     e.stopPropagation();
   };
 
+  // Fullscreen functionality
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Erro ao alternar fullscreen:', error);
+    }
+  };
+
   const toggleTheme = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent bubbling
+    e.stopPropagation();
     const newMode = settings.mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
   };
@@ -95,6 +119,19 @@ const AppContent: React.FC<{
       <header className="bg-white dark:bg-slate-800 border-b py-4 px-4 sm:px-6 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleFullscreen}
+              className="mr-2"
+              aria-label={isFullscreen ? 'Sair do modo tela cheia' : 'Entrar no modo tela cheia'}
+            >
+              {isFullscreen ? (
+                <Minimize className="h-5 w-5" />
+              ) : (
+                <Maximize className="h-5 w-5" />
+              )}
+            </Button>
             <ShoppingCart className="h-6 w-6 text-primary mr-2" />
             <h1 className="text-xl font-bold">Cartify</h1>
           </div>
